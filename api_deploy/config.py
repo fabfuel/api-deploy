@@ -32,8 +32,3 @@ class Config(Dict):
     def from_file(cls, file_path):
         config_file = ConfigFile.from_file(file_path)
         return cls(config_file)
-
-# configfile = ConfigFile.from_file('../api.yml')
-#
-# config = Config.from_file('../api.yml')
-# print(config)

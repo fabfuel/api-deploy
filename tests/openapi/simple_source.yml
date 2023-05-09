@@ -1,0 +1,151 @@
+openapi: "3.0.1"
+info:
+  description: "Test API"
+  title: "Test"
+  version: "1"
+  contact:
+    name: Fabian Fuelling
+    email: api@fabfuel.de
+servers:
+  - url: "https://api.fabfuel.de/test"
+  - url: "https://api-staging.fabfuel.de/test"
+tags:
+  - name: Health
+    description: Ping and health check endpoints
+
+paths:
+  /-/ping:
+    get:
+      operationId: ping
+      description: Receive a ping response
+      tags:
+        - Health
+      responses:
+        "200":
+          $ref: "#/components/responses/Ping"
+        "400":
+          $ref: "#/components/responses/BadRequest"
+        "404":
+          $ref: "#/components/responses/NotFound"
+        "500":
+          $ref: "#/components/responses/ServerError"
+    post:
+      operationId: pingPost
+      description: Post a custom Ping request
+      tags:
+        - Health
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: "#/components/schemas/PingPayload"
+      responses:
+        "200":
+          $ref: "#/components/responses/Ping"
+        "400":
+          $ref: "#/components/responses/BadRequest"
+        "404":
+          $ref: "#/components/responses/NotFound"
+        "500":
+          $ref: "#/components/responses/ServerError"
+      x-amazon-apigateway-request-validator: "all"
+
+components:
+  schemas:
+    PingPayload:
+      type: object
+      required:
+        - ping
+        - pingAt
+        - pingBy
+      properties:
+        ping:
+          type: string
+          example: pong
+        pingBy:
+          $ref: "#/components/schemas/UserIdentity"
+        pingAt:
+          $ref: "#/components/schemas/Timestamp"
+
+    Timestamp:
+      type: string
+      format: date-time
+
+    UserIdentity:
+      type: string
+      description: Unique user identifier
+      example: user@server.com
+
+    ErrorResponse:
+      type: object
+      required:
+        - code
+        - message
+        - incident
+      properties:
+        code:
+          type: integer
+          example: 500
+        message:
+          type: "string"
+          example: "Internal Server Error"
+        incident:
+          description: "Unique incident identifier"
+          type: "string"
+          example: "5beb965c-7ffc-468b-a063-eb47c5b366c2"
+
+    ErrorResponseBadRequest:
+      allOf:
+        - $ref: "#/components/schemas/ErrorResponse"
+        - type: object
+          properties:
+            code:
+              example: 400
+            message:
+              example: "Bad Request"
+
+    ErrorResponseNotFound:
+      allOf:
+        - $ref: "#/components/schemas/ErrorResponse"
+        - type: object
+          properties:
+            code:
+              example: 404
+            message:
+              example: "Not Found"
+
+  responses:
+    Ping:
+      description: Ping
+      content:
+        application/json:
+          schema:
+            $ref: "#/components/schemas/PingPayload"
+      headers:
+        X-Ping:
+          schema:
+            type: string
+    ServerError:
+      description: Internal Server Error
+      content:
+        application/json:
+          schema:
+            $ref: "#/components/schemas/ErrorResponse"
+    BadRequest:
+      description: Bad Request
+      content:
+        application/json:
+          schema:
+            $ref: "#/components/schemas/ErrorResponseBadRequest"
+    NotFound:
+      description: Not Found
+      content:
+        application/json:
+          schema:
+            $ref: "#/components/schemas/ErrorResponseNotFound"
+
+x-amazon-apigateway-request-validators:
+  all:
+    validateRequestParameters: true
+    validateRequestBody: true
