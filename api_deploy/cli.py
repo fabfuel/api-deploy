@@ -34,7 +34,17 @@ def compile_file(config_file, source_file, target_file):
 @click.option('--profile', required=False, help='AWS configuration profile name')
 @click.option('--account', required=False, help='Target AWS account id to deploy in')
 @click.option('--assume-role', required=False, help='AWS Role to assume in target account')
-def deploy(config_file, api_id, stage_name, source_file, region, access_key_id, secret_access_key, profile, account, assume_role):
+def deploy(config_file,
+           api_id,
+           stage_name,
+           source_file,
+           region,
+           access_key_id,
+           secret_access_key,
+           profile,
+           account,
+           assume_role,
+           ):
     client = _get_client(access_key_id, secret_access_key, region, profile, account, assume_role)
     config = Config.from_file(config_file)
 

@@ -1,2 +1,3 @@
 pytest==7.2.0
 dictdiffer==0.9.0
+flake8

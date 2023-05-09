@@ -51,4 +51,3 @@ class ApiGatewayClient(object):
             restApiId=api_id,
             stageName=stage_name
         )
-
