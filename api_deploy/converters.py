@@ -2,8 +2,8 @@ from abc import ABC, abstractmethod
 from copy import deepcopy
 from mergedeep import merge
 
+from api_deploy.config import Config
 from api_deploy.schema import Schema
-from dictdiffer import diff
 
 
 class AbstractProcessor(ABC):
@@ -23,12 +23,12 @@ class ProcessManager:
         self.__processors: [AbstractProcessor] = []
 
     @classmethod
-    def default(cls, **kwargs):
+    def default(cls, config: Config):
         default_manager = cls()
-        default_manager.register(PassthroughProcessor(**kwargs))
-        default_manager.register(FlattenProcessor(**kwargs))
-        default_manager.register(ApiGatewayProcessor(**kwargs))
-        default_manager.register(CorsProcessor(**kwargs))
+        default_manager.register(PassthroughProcessor(**config['headers']))
+        default_manager.register(FlattenProcessor())
+        default_manager.register(ApiGatewayProcessor(**config['gateway']))
+        default_manager.register(CorsProcessor(headers=config['headers'], **config['cors']))
         return default_manager
 
     def register(self, processor: AbstractProcessor):
@@ -108,7 +108,7 @@ class FlattenProcessor(AbstractProcessor):
     def lookup_ref(ref: dict, schema: Schema):
         name = ref['$ref']
         components, component_type, model = name.split('/')[1:]
-        return schema[components][component_type][model]
+        return schema[components][component_type].get(model)
 
     @staticmethod
     def first_key(node):
@@ -144,9 +144,9 @@ class FlattenProcessor(AbstractProcessor):
 
 
 class ApiGatewayProcessor(AbstractProcessor):
-    def __init__(self, base_uri, connection_id, **kwargs) -> None:
+    def __init__(self, integration_host, connection_id, **kwargs) -> None:
         super().__init__()
-        self.base_uri = base_uri
+        self.integration_host = integration_host
         self.connection_id = connection_id
 
     def process(self, schema: Schema) -> Schema:
@@ -157,7 +157,7 @@ class ApiGatewayProcessor(AbstractProcessor):
                     'type': 'http',
                     'connectionId': self.connection_id,
                     'httpMethod': str(method).upper(),
-                    'uri': self.base_uri + path,
+                    'uri': self.integration_host + path,
                     'passthroughBehavior': 'when_no_match',
                     'connectionType': 'VPC_LINK',
                     'responses': self._get_response_codes(schema, path, method),
@@ -199,9 +199,9 @@ class ApiGatewayProcessor(AbstractProcessor):
 
 
 class CorsProcessor(AbstractProcessor):
-    def __init__(self, allow_headers=(), allow_origin='*', **kwargs) -> None:
+    def __init__(self, headers, allow_origin, **kwargs) -> None:
         super().__init__()
-        self.allow_headers = allow_headers
+        self.allow_headers = headers['request']
         self.allow_origin = allow_origin
 
     def process(self, schema: Schema) -> Schema:
@@ -301,23 +301,25 @@ class CorsProcessor(AbstractProcessor):
         return schema
 
 
-class PassthroughProcessor:
-    def __init__(self, **kwargs) -> None:
+class PassthroughProcessor(AbstractProcessor):
+    def __init__(self, request, response, **kwargs) -> None:
+        self.request_headers: [str] = request
+        self.response_headers: [str] = response
         super().__init__()
 
     @staticmethod
-    def add_parameter(params_list, name, location, description):
-        params_list.append(
-            {
-                'name': name,
-                'in': location,
-                'description': description,
-                'required': False,
-                'schema': {
-                    'type': 'string',
-                }
+    def add_parameter(params_list, name, location, description=None):
+        param = {
+            'name': name,
+            'in': location,
+            'required': False,
+            'schema': {
+                'type': 'string',
             }
-        )
+        }
+        if description:
+            param['description'] = description
+        params_list.append(param)
 
     def process(self, schema: Schema) -> Schema:
         for path in schema['paths']:
@@ -325,23 +327,12 @@ class PassthroughProcessor:
                 endpoint = schema['paths'][path][method]
                 params = endpoint.setdefault('parameters', [])
 
-                self.add_parameter(params, 'Host', 'header', 'Requested host name')
-                self.add_parameter(params, 'Authorization', 'header', 'Authorization credentials')
-                self.add_parameter(params, 'X-Request-Id', 'header', 'Unique request ID')
-                self.add_parameter(params, 'X-Datadog-Trace-Id', 'header', 'Unique Datadog Trace ID')
-                self.add_parameter(params, 'X-Datadog-Parent-Id', 'header', 'Unique Datadog Trace ID')
-                self.add_parameter(params, 'X-Datadog-Origin', 'header', 'Unique Datadog Trace ID')
+                for header in self.request_headers:
+                    self.add_parameter(params, header, 'header')
+
+                # self.add_parameter(params, 'Authorization', 'header', 'Authorization credentials')
+                # self.add_parameter(params, 'X-Datadog-Trace-Id', 'header', 'Unique Datadog Trace ID')
+                # self.add_parameter(params, 'X-Datadog-Parent-Id', 'header', 'Unique Datadog Trace ID')
+                # self.add_parameter(params, 'X-Datadog-Origin', 'header', 'Unique Datadog Trace ID')
 
         return schema
-
-# manager = ProcessManager.default()
-#
-# test_schema = Schema.from_file('../tests/openapi/simple_source.yml')
-#
-# new_schema = manager.process(test_schema)
-# print(test_schema)
-# print('-----')
-# print(new_schema)
-#
-# for dif in diff(test_schema, new_schema):
-#     print(dif)
