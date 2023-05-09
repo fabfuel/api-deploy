@@ -33,7 +33,7 @@ jobs:
           context: .
           file: ./Dockerfile
           push: true
-          tags: fabfuel/ecs-deploy:${{ github.ref_name }}
+          tags: fabfuel/api-deploy:${{ github.ref_name }}
       -
         name: "Build and push (tag: latest)"
         if: github.ref == 'refs/heads/develop'
@@ -42,4 +42,4 @@ jobs:
           context: .
           file: ./Dockerfile
           push: true
-          tags: fabfuel/ecs-deploy:latest
+          tags: fabfuel/api-deploy:latest
