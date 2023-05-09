@@ -1,11 +1,11 @@
-from typing import TextIO, Dict
+from typing import Dict
 import yaml
 
 yaml.Dumper.ignore_aliases = lambda *args: True
 
 
 class YamlDict(Dict):
-    def __init__(self, schema: str | TextIO) -> None:
+    def __init__(self, schema) -> None:
         content = yaml.load(schema, yaml.Loader) or {}
         super().__init__(content)
 
