@@ -1,21 +1,9 @@
 import click
 
 from api_deploy.client import ApiGatewayClient
-from api_deploy.processors import ProcessManager
+from api_deploy.config import Config
+from api_deploy.converters import ProcessManager
 from api_deploy.schema import Schema
-
-process_options = dict(
-    base_uri='https://${stageVariables.host}',
-    connection_id='${stageVariables.connectionId}',
-    allow_headers=[
-        'Content-Type',
-        'Authorization',
-        'x-datadog-origin',
-        'x-datadog-sampling-priority',
-        'x-datadog-parent-id',
-        'x-datadog-trace-id'
-    ],
-)
 
 
 @click.group()
@@ -25,15 +13,18 @@ def api():  # pragma: no cover
 
 
 @click.command('compile')
+@click.argument('config_file')
 @click.argument('source_file')
 @click.argument('target_file')
-def compile_file(source_file, target_file):
+def compile_file(config_file, source_file, target_file):
+    config = Config.from_file(config_file)
     source_schema = Schema.from_file(source_file)
-    target_schema = _compile(source_schema)
+    target_schema = _compile(source_schema, config)
     target_schema.to_file(target_file)
 
 
 @click.command()
+@click.argument('config_file')
 @click.argument('api_id')
 @click.argument('stage_name')
 @click.argument('source_file')
@@ -43,14 +34,25 @@ def compile_file(source_file, target_file):
 @click.option('--profile', required=False, help='AWS configuration profile name')
 @click.option('--account', required=False, help='Target AWS account id to deploy in')
 @click.option('--assume-role', required=False, help='AWS Role to assume in target account')
-def deploy(api_id, stage_name, source_file, region, access_key_id, secret_access_key, profile, account, assume_role):
+def deploy(config_file,
+           api_id,
+           stage_name,
+           source_file,
+           region,
+           access_key_id,
+           secret_access_key,
+           profile,
+           account,
+           assume_role,
+           ):
     client = _get_client(access_key_id, secret_access_key, region, profile, account, assume_role)
+    config = Config.from_file(config_file)
 
     click.secho(f'Deploying API "{api_id}", stage "{stage_name}"\n')
     click.secho(f'Compiling OpenAPI file: "{source_file}"')
 
     source_schema = Schema.from_file(source_file)
-    target_schema = _compile(source_schema)
+    target_schema = _compile(source_schema, config)
 
     click.secho('Successfully compiled OpenAPI file.\n', fg='green')
     click.secho(f'Importing OpenAPI file to API Gateway "{api_id}"')
@@ -68,8 +70,8 @@ def deploy(api_id, stage_name, source_file, region, access_key_id, secret_access
     click.secho('Successfully deployed API configuration.\n', fg='green')
 
 
-def _compile(source_schema):
-    manager = ProcessManager.default(**process_options)
+def _compile(source_schema: Schema, config: Config):
+    manager = ProcessManager.default(config)
     return manager.process(source_schema)
 
 

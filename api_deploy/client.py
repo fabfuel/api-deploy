@@ -31,7 +31,7 @@ class ApiGatewayClient(object):
         sts = sts_session.client('sts')
         response = sts.assume_role(
             RoleArn=role_arn,
-            RoleSessionName='ecsDeploy',
+            RoleSessionName='apiDeploy',
         )
         access_key_id = response['Credentials']['AccessKeyId']
         secret_access_key = response['Credentials']['SecretAccessKey']
@@ -51,4 +51,3 @@ class ApiGatewayClient(object):
             restApiId=api_id,
             stageName=stage_name
         )
-

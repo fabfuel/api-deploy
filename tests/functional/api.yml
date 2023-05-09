@@ -1,0 +1,15 @@
+gateway:
+  integrationHost: https://integration.com
+  connectionId: 1234567890
+headers:
+  request:
+    - host
+    - authorization
+    - x-datadog-trace-id
+    - x-datadog-parent-id
+    - x-datadog-origin
+    - x-datadog-sampling-priority
+  response:
+    - Location
+cors:
+  origin: 'foo.com'

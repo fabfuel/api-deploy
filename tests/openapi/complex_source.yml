@@ -1,0 +1,638 @@
+openapi: "3.0.1"
+info:
+  description: "Complex API configuration"
+  title: "Complex OpenAPI"
+  version: "1"
+servers:
+  - url: "https://api.server1.com/projects"
+  - url: "https://api.server2.com/projects"
+  - url: "https://api.server3com/projects"
+tags:
+  - name: Health
+    description: Ping and health check endpoints
+  - name: Labels
+    description: Label management
+  - name: Offers
+    description: Project management
+  - name: Vendor
+    description: Vendor management
+
+paths:
+  /-/ping:
+    get:
+      operationId: ping
+      description: Ping endpoint
+      tags:
+        - Health
+      responses:
+        "200":
+          description: Ping
+          content: {}
+        "500":
+          $ref: "#/components/responses/ServerError"
+
+  /-/health:
+    get:
+      operationId: health
+      description: Health check endpoint
+      tags:
+        - Health
+      security:
+        - authorizer-foobar: []
+      responses:
+        "200":
+          description: health
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/Health"
+        "500":
+          $ref: "#/components/responses/ServerError"
+
+  /v1/labels:
+    get:
+      description: List all labels
+      operationId: listLabels
+      tags:
+        - Labels
+      parameters:
+        - $ref: "#/components/parameters/limit"
+        - $ref: "#/components/parameters/offset"
+      security:
+        - authorizer-foobar: []
+      responses:
+        "200":
+          description: Labels List
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/LabelList"
+        "400":
+          $ref: "#/components/responses/BadRequest"
+        "404":
+          $ref: "#/components/responses/NotFound"
+        "500":
+          $ref: "#/components/responses/ServerError"
+
+  /v1/vendors/{vendorId}/offers:
+    get:
+      description: Get all offers of the vendor
+      operationId: listOffers
+      tags:
+        - Offers
+        - Vendor
+      parameters:
+        - $ref: "#/components/parameters/vendorId"
+        - $ref: "#/components/parameters/limit"
+        - $ref: "#/components/parameters/offset"
+      security:
+        - authorizer-foobar: []
+      responses:
+        "200":
+          description: Offer List
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/OfferList"
+        "400":
+          $ref: "#/components/responses/BadRequest"
+        "404":
+          $ref: "#/components/responses/NotFound"
+        "500":
+          $ref: "#/components/responses/ServerError"
+
+  /v1/vendors/{vendorId}/offers/{offerId}:
+    get:
+      description: Get a specific offer of the vendor
+      operationId: getOffer
+      tags:
+        - Offers
+        - Vendor
+      parameters:
+        - $ref: "#/components/parameters/vendorId"
+        - $ref: "#/components/parameters/offerId"
+      security:
+        - authorizer-foobar: []
+      responses:
+        "200":
+          description: Get Offer
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/Offer"
+
+        "400":
+          $ref: "#/components/responses/BadRequest"
+        "404":
+          $ref: "#/components/responses/NotFound"
+        "500":
+          $ref: "#/components/responses/ServerError"
+
+components:
+  schemas:
+    Health:
+      type: object
+      additionalProperties: false
+      properties:
+        application:
+          type: object
+          additionalProperties: false
+          properties:
+            datetime:
+              type: string
+              format: date-time
+              description: Current date and time of the server
+            name:
+              type: string
+              description: Name of the application
+            environment:
+              type: string
+              description: Name of the environment the app is running in
+            uptime:
+              type: string
+              description: Duration of how long the app is running
+            startup:
+              type: string
+              format: date-time
+              description: Date and time when the application started
+            hostname:
+              type: string
+              description: Hostname of the application host or container
+            version:
+              type: string
+              description: Current release version
+
+    MetadataItem:
+      type: object
+      readOnly: true
+      required:
+        - createdAt
+        - createdBy
+      additionalProperties: false
+      properties:
+        createdAt:
+          type: string
+          format: date-time
+          nullable: true
+        createdBy:
+          $ref: "#/components/schemas/EntityId"
+        modifiedAt:
+          type: string
+          format: date-time
+          nullable: true
+        modifiedBy:
+          $ref: "#/components/schemas/EntityId"
+        revisionedAt:
+          type: string
+          format: date-time
+          nullable: true
+        revisionedBy:
+          $ref: "#/components/schemas/EntityId"
+        archivedAt:
+          type: string
+          format: date-time
+          nullable: true
+        archivedBy:
+          $ref: "#/components/schemas/EntityId"
+        _links:
+          $ref: "#/components/schemas/Links"
+
+    MetadataList:
+      type: object
+      additionalProperties: false
+      properties:
+        count:
+          description: Number of fetched items
+          type: integer
+          default: 10
+        total:
+          description: Total number of items available in the list
+          type: integer
+          default: 15
+        limit:
+          description: Maximum number of items to fetch
+          type: integer
+          default: 50
+        offset:
+          description: Number if items skipped (for pagination)
+          type: integer
+          default: 0
+
+    Links:
+      type: object
+      readOnly: true
+      properties:
+        self:
+          type: object
+          additionalProperties: false
+          properties:
+            href:
+              type: string
+              example: https://api.server.com/v1/projects/5d4470a6-121b-40d2-aff9-00f24aa4a110
+
+    StateTransition:
+      type: object
+      readOnly: true
+      required:
+        - originalState
+        - targetState
+        - transitionedAt
+        - transitionedBy
+        - comment
+      additionalProperties: false
+      properties:
+        originalState:
+          type: string
+          example: state1
+        targetState:
+          type: string
+          example: state2
+        transitionedAt:
+          type: string
+          format: date-time
+        transitionedBy:
+          $ref: "#/components/schemas/EntityId"
+        comment:
+          type: string
+          nullable: true
+          example: Additional user generated info about the transition
+
+    StateTransitionList:
+      type: array
+      readOnly: true
+      items:
+        $ref: "#/components/schemas/StateTransition"
+
+    Attachment:
+      type: object
+      nullable: true
+      description: File attachment details
+      additionalProperties: false
+      properties:
+        name:
+          type: string
+          description: Human readable file name
+          example: example.pdf
+        path:
+          type: string
+          description: Relative file path of the attachment
+          example: /vendors/1234567890/some.pdf
+        uploadedAt:
+          type: string
+          format: date-time
+          description: Date and time of when the attachment was uploaded
+        uploadedBy:
+          $ref: "#/components/schemas/EntityId"
+
+    Address:
+      type: object
+      additionalProperties: false
+      properties:
+        streetAddress:
+          description: Full street address component, which MAY include house number, street name, Post Office Box, and multi-line extended street address information.
+          type: string
+          example: "My Street 123"
+          nullable: true
+        postalCode:
+          description: Zip code or postal code component.
+          type: string
+          minLength: 1
+          example: "10119"
+        locality:
+          description: City or locality component.
+          type: string
+          example: "Berlin"
+          nullable: true
+        region:
+          description: State, province, prefecture, or region component.
+          type: string
+          example: "Berlin"
+          nullable: true
+        country:
+          description: Country name component.
+          type: string
+          minLength: 1
+          maxLength: 2
+          example: "de"
+
+    Label:
+      type: object
+      additionalProperties: false
+      required:
+        - slug
+        - label
+        - color
+      properties:
+        slug:
+          type: string
+          readOnly: true
+          example: "lorem-ipsum"
+          description: Alphanumeric version of the label without spaces or special chars.
+        name:
+          type: string
+          example: "Lorem Ipsum"
+          description: Human readable name
+        color:
+          type: string
+          description: Color of the label
+          enum:
+            - red
+            - green
+            - blue
+        _links:
+          $ref: "#/components/schemas/Links"
+
+    LabelList:
+      type: object
+      additionalProperties: false
+      properties:
+        _embedded:
+          type: object
+          additionalProperties: false
+          properties:
+            label:
+              type: array
+              items:
+                $ref: "#/components/schemas/Label"
+        _meta:
+          $ref: "#/components/schemas/MetadataList"
+        _links:
+          $ref: "#/components/schemas/Links"
+
+    OfferList:
+      type: object
+      additionalProperties: false
+      properties:
+        _embedded:
+          type: object
+          additionalProperties: false
+          properties:
+            offer:
+              type: array
+              items:
+                $ref: "#/components/schemas/Offer"
+        _meta:
+          $ref: "#/components/schemas/MetadataList"
+        _links:
+          $ref: "#/components/schemas/Links"
+
+    Offer:
+      type: object
+      required:
+        - attachments
+        - comment
+        - offerId
+        - state
+        - stateTransitions
+        - vendorId
+        - _stats
+        - _meta
+        - _links
+        - _embedded
+      additionalProperties: false
+      properties:
+        offerId:
+          $ref: "#/components/schemas/EntityId"
+        projectId:
+          $ref: "#/components/schemas/EntityId"
+        vendorId:
+          $ref: "#/components/schemas/EntityId"
+        attachments:
+          type: array
+          description: Array of file attachments
+          items:
+            $ref: "#/components/schemas/Attachment"
+        comment:
+          type: string
+          nullable: true
+          example: User generated info about the offer
+        state:
+          type: string
+          description: The current state of the offer
+          readOnly: true
+          enum:
+            - draft
+            - submitted
+        stateTransitions:
+          $ref: "#/components/schemas/StateTransitionList"
+        _meta:
+          $ref: "#/components/schemas/MetadataItem"
+        _links:
+          $ref: "#/components/schemas/Links"
+        _embedded:
+          type: object
+          required:
+            - project
+          additionalProperties: false
+          properties:
+            project:
+              type: array
+              minItems: 1
+              items:
+                $ref: "#/components/schemas/Project"
+
+    Project:
+      type: object
+      additionalProperties: false
+      properties:
+        projectId:
+          $ref: "#/components/schemas/EntityId"
+        customerId:
+          $ref: "#/components/schemas/EntityId"
+        attachments:
+          type: array
+          description: Array of file attachments
+          items:
+            $ref: "#/components/schemas/Attachment"
+        company:
+          type: object
+          additionalProperties: false
+          properties:
+            name:
+              description: name of the company
+              type: string
+              example: Company AY
+            email:
+              description: primary contact email of the company
+              type: string
+              example: mail@server.com
+            phoneNumber:
+              description: primary contact phone number of the company
+              type: string
+              example: "+49 (30) 1234567890"
+              nullable: true
+            deliveryAddress:
+              $ref: "#/components/schemas/Address"
+        description:
+          type: string
+          example: "This is an example project"
+          description: A human readable project description
+          nullable: true
+        title:
+          type: string
+          example: "Example project"
+          description: A custom, human readable project title
+        state:
+          type: string
+          description: The current state of the project
+          readOnly: true
+          enum:
+            - new
+            - active
+            - done
+        stateTransitions:
+          $ref: "#/components/schemas/StateTransitionList"
+        _meta:
+          $ref: "#/components/schemas/MetadataItem"
+        _links:
+          $ref: "#/components/schemas/Links"
+
+    EntityId:
+      type: string
+      format: uuid
+
+  responses:
+    BadRequest:
+      description: Bad Request
+      content:
+        application/json:
+          schema:
+            type: object
+            required:
+              - statusCode
+              - message
+            additionalProperties: false
+            properties:
+              statusCode:
+                type: integer
+                example: 400
+              message:
+                type: "string"
+                example: "Bad Request"
+              incident:
+                description: "Unique incident identifier"
+                type: "string"
+                example: "5beb965c-7ffc-468b-a063-eb47c5b366c2"
+    NotFound:
+      description: Not Found
+      content:
+        application/json:
+          schema:
+            type: object
+            required:
+              - statusCode
+              - message
+            additionalProperties: false
+            properties:
+              statusCode:
+                type: integer
+                example: 404
+              message:
+                type: "string"
+                example: "Not Found"
+              error:
+                type: "string"
+                example: "Not Found"
+              incident:
+                description: "Unique incident identifier"
+                type: "string"
+                example: "5beb965c-7ffc-468b-a063-eb47c5b366c2"
+    ServerError:
+      description: Internal Server Error
+      content:
+        application/json:
+          schema:
+            type: object
+            required:
+              - statusCode
+              - message
+            additionalProperties: false
+            properties:
+              statusCode:
+                type: integer
+                example: 500
+              message:
+                type: "string"
+                example: "Internal Server Error"
+              incident:
+                description: "Unique incident identifier"
+                type: "string"
+                example: "5beb965c-7ffc-468b-a063-eb47c5b366c2"
+                nullable: true
+
+  securitySchemes:
+    authorizer-foobar:
+      type: "apiKey"
+      name: "Authorization"
+      in: "header"
+      x-amazon-apigateway-authtype: "custom"
+      x-amazon-apigateway-authorizer:
+        type: "token"
+        authorizerUri: "arn:aws:apigateway:eu-central-1:lambda:path/1"
+        authorizerResultTtlInSeconds: 300
+
+  parameters:
+    vendorId:
+      name: vendorId
+      in: path
+      description: ID of the vendor
+      required: true
+      schema:
+        type: string
+        minLength: 1
+    projectId:
+      name: projectId
+      in: path
+      description: ID of the project
+      required: true
+      schema:
+        $ref: "#/components/schemas/EntityId"
+    offerId:
+      name: offerId
+      in: path
+      description: ID of the offer
+      required: true
+      schema:
+        $ref: "#/components/schemas/EntityId"
+    limit:
+      name: limit
+      in: query
+      description: Maximum number of items to fetch
+      required: false
+      schema:
+        default: 50
+        type: integer
+        minimum: 1
+        maximum: 1000
+    offset:
+      name: offset
+      in: query
+      description: number of items to skip, used for pagination
+      required: false
+      schema:
+        default: 0
+        type: integer
+        minimum: 0
+    foobar:
+      name: foobar
+      in: query
+      description: Customer name that should be added/shown
+      required: false
+      schema:
+        type: string
+    sfa:
+      name: sfa
+      in: query
+      description: whether or not to show the full address
+      required: false
+      schema:
+        type: integer
+        minimum: 0
+        maximum: 1
+    label:
+      name: label
+      in: path
+      description: Unique label slug
+      required: true
+      schema:
+        type: string

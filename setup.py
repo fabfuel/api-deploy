@@ -15,7 +15,7 @@ dependencies = [
     'click>=8.1.3, <9',
     'mergedeep>=1.3.4',
     'boto3>=1.26.118',
-    'requests>=2.28.2',
+    'PyYAML>=6.0',
 ]
 
 setup(
