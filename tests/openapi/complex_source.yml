@@ -58,6 +58,7 @@ paths:
       parameters:
         - $ref: "#/components/parameters/limit"
         - $ref: "#/components/parameters/offset"
+        - $ref: "#/components/parameters/foobar"
       security:
         - authorizer-foobar: []
       responses:
@@ -619,16 +620,9 @@ components:
       description: Customer name that should be added/shown
       required: false
       schema:
-        type: string
-    sfa:
-      name: sfa
-      in: query
-      description: whether or not to show the full address
-      required: false
-      schema:
-        type: integer
-        minimum: 0
-        maximum: 1
+        type: array
+        items:
+          type: string
     label:
       name: label
       in: path
