@@ -189,11 +189,18 @@ class ApiGatewayProcessor(AbstractProcessor):
         }
 
         for parameter in schema['paths'][path][method].get('parameters', []):
-            source = parameter.get('in')
-            if source == 'query':
-                source = 'querystring'
+            source_integration = parameter.get('in')
+            source_method = parameter.get('in')
+
+            if parameter.get('in') == 'query':
+                source_integration = 'querystring'
+                if parameter.get('schema', {}).get('type') == 'array':
+                    source_method = 'multivaluequerystring'
+                else:
+                    source_method = 'querystring'
+
             name = parameter.get('name')
-            parameters[f'integration.request.{source}.{name}'] = f'method.request.{source}.{name}'
+            parameters[f'integration.request.{source_integration}.{name}'] = f'method.request.{source_method}.{name}'
 
         return parameters
 

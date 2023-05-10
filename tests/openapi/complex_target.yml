@@ -310,6 +310,14 @@ paths:
           default: 0
           type: integer
           minimum: 0
+      - name: foobar
+        in: query
+        description: Customer name that should be added/shown
+        required: false
+        schema:
+          type: array
+          items:
+            type: string
       - name: host
         in: header
         required: false
@@ -466,6 +474,7 @@ paths:
           integration.request.header.X-Stage: context.stage
           integration.request.querystring.limit: method.request.querystring.limit
           integration.request.querystring.offset: method.request.querystring.offset
+          integration.request.querystring.foobar: method.request.multivaluequerystring.foobar
           integration.request.header.host: method.request.header.host
           integration.request.header.authorization: method.request.header.authorization
           integration.request.header.x-datadog-trace-id: method.request.header.x-datadog-trace-id
