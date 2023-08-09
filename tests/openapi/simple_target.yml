@@ -115,6 +115,7 @@ paths:
             statusCode: '200'
             responseParameters:
               method.response.header.Access-Control-Allow-Origin: '''foo.com'''
+              method.response.header.X-Ping: integration.response.header.X-Ping
           '400':
             statusCode: '400'
             responseParameters:
@@ -240,6 +241,7 @@ paths:
             statusCode: '200'
             responseParameters:
               method.response.header.Access-Control-Allow-Origin: '''foo.com'''
+              method.response.header.X-Ping: integration.response.header.X-Ping
           '400':
             statusCode: '400'
             responseParameters:
