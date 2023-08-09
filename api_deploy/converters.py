@@ -165,8 +165,7 @@ class ApiGatewayProcessor(AbstractProcessor):
                 }
         return schema
 
-    @staticmethod
-    def _get_response_codes(schema, path, method):
+    def _get_response_codes(self, schema, path, method):
         responses = {
             'default': {
                 'statusCode': '500'
@@ -178,7 +177,20 @@ class ApiGatewayProcessor(AbstractProcessor):
             responses[response_code] = {
                 'statusCode': response_code
             }
+            responses[response_code]['responseParameters'] = self._get_response_parameters(schema,
+                                                                                           path,
+                                                                                           method,
+                                                                                           response_code)
+
         return responses
+
+    def _get_response_parameters(self, schema, path, method, response_code):
+        response_headers = schema['paths'][path][method]['responses'].get(response_code, {}).get('headers', {})
+        response_parameters = {}
+        for header in response_headers:
+            response_parameters[f'method.response.header.{header}'] = f'integration.response.header.{header}'
+
+        return response_parameters
 
     @staticmethod
     def _get_request_parameters(schema, path, method):

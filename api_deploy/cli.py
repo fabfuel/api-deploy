@@ -1,5 +1,6 @@
 import click
 
+from api_deploy import VERSION
 from api_deploy.client import ApiGatewayClient
 from api_deploy.config import Config
 from api_deploy.converters import ProcessManager
@@ -7,7 +8,7 @@ from api_deploy.schema import Schema
 
 
 @click.group()
-@click.version_option(version='0.0.1', prog_name='api-deploy')
+@click.version_option(version=VERSION, prog_name='api-deploy')
 def api():  # pragma: no cover
     pass
 
