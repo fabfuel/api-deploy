@@ -28,7 +28,7 @@ paths:
               schema:
                 $ref: '#/components/schemas/PingPayload'
           headers:
-            X-Ping:
+            x-ping:
               schema:
                 type: string
             Access-Control-Allow-Origin:
@@ -115,7 +115,7 @@ paths:
             statusCode: '200'
             responseParameters:
               method.response.header.Access-Control-Allow-Origin: '''foo.com'''
-              method.response.header.X-Ping: integration.response.header.X-Ping
+              method.response.header.x-ping: integration.response.header.x-ping
           '400':
             statusCode: '400'
             responseParameters:
@@ -153,7 +153,7 @@ paths:
               schema:
                 $ref: '#/components/schemas/PingPayload'
           headers:
-            X-Ping:
+            x-ping:
               schema:
                 type: string
             Access-Control-Allow-Origin:
@@ -241,7 +241,7 @@ paths:
             statusCode: '200'
             responseParameters:
               method.response.header.Access-Control-Allow-Origin: '''foo.com'''
-              method.response.header.X-Ping: integration.response.header.X-Ping
+              method.response.header.x-ping: integration.response.header.x-ping
           '400':
             statusCode: '400'
             responseParameters:
@@ -280,14 +280,14 @@ paths:
             Access-Control-Allow-Headers:
               schema:
                 type: string
-                example: host,authorization,x-datadog-trace-id,x-datadog-parent-id,x-datadog-origin,x-datadog-sampling-priority
+                example: authorization,host,x-datadog-origin,x-datadog-parent-id,x-datadog-sampling-priority,x-datadog-trace-id,x-ping
       x-amazon-apigateway-integration:
         responses:
           default:
             statusCode: '200'
             responseParameters:
               method.response.header.Access-Control-Allow-Methods: '''GET,POST,OPTIONS'''
-              method.response.header.Access-Control-Allow-Headers: '''host,authorization,x-datadog-trace-id,x-datadog-parent-id,x-datadog-origin,x-datadog-sampling-priority'''
+              method.response.header.Access-Control-Allow-Headers: '''authorization,host,x-datadog-origin,x-datadog-parent-id,x-datadog-sampling-priority,x-datadog-trace-id,x-ping'''
               method.response.header.Access-Control-Allow-Origin: '''foo.com'''
         requestTemplates:
           application/json: '{"statusCode": 200}'

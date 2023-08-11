@@ -229,7 +229,6 @@ class CorsProcessor(AbstractProcessor):
             'description': 'CORS configuration endpoints',
         })
 
-        allow_headers = ','.join(self.allow_headers)
         allow_methods = 'OPTIONS'
 
         for path in schema['paths']:
@@ -237,6 +236,7 @@ class CorsProcessor(AbstractProcessor):
             path_param_names = []
             methods = list(schema['paths'][path].keys())
             methods.append('options')
+            allow_headers = set(self.allow_headers)
 
             for method in schema['paths'][path]:
                 allow_methods = ','.join([m.upper() for m in methods])
@@ -248,9 +248,13 @@ class CorsProcessor(AbstractProcessor):
                         path_params.append(parameter)
                         path_param_names.append(parameter['name'])
 
-                for response in endpoint['responses']:
-                    endpoint['responses'][response].setdefault('headers', {})
-                    endpoint['responses'][response]['headers']['Access-Control-Allow-Origin'] = {
+                for response_code in endpoint['responses']:
+                    for response_header in endpoint['responses'][response_code].get('headers', {}):
+                        if response_header != 'Access-Control-Allow-Origin':
+                            allow_headers.add(response_header)
+
+                    endpoint['responses'][response_code].setdefault('headers', {})
+                    endpoint['responses'][response_code]['headers']['Access-Control-Allow-Origin'] = {
                         'schema': {
                             'type': 'string',
                             'example': f'{self.allow_origin}',
@@ -264,6 +268,9 @@ class CorsProcessor(AbstractProcessor):
 
             if 'options' in schema['paths'][path]:
                 continue
+
+            allow_headers = list(allow_headers)
+            allow_headers.sort()
 
             options_method = {
                 'operationId': path + 'CORS',
@@ -288,7 +295,7 @@ class CorsProcessor(AbstractProcessor):
                             'Access-Control-Allow-Headers': {
                                 'schema': {
                                     'type': 'string',
-                                    'example': f'{allow_headers}',
+                                    'example': f'{",".join(allow_headers)}',
                                 },
                             },
                         },
@@ -300,7 +307,7 @@ class CorsProcessor(AbstractProcessor):
                             'statusCode': '200',
                             'responseParameters': {
                                 'method.response.header.Access-Control-Allow-Methods': f'\'{allow_methods}\'',
-                                'method.response.header.Access-Control-Allow-Headers': f'\'{allow_headers}\'',
+                                'method.response.header.Access-Control-Allow-Headers': f'\'{",".join(allow_headers)}\'',
                                 'method.response.header.Access-Control-Allow-Origin': f'\'{self.allow_origin}\'',
                             }
                         }
