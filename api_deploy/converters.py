@@ -237,6 +237,7 @@ class CorsProcessor(AbstractProcessor):
             methods = list(schema['paths'][path].keys())
             methods.append('options')
             allow_headers = set(self.allow_headers)
+            expose_headers = {}
 
             for method in schema['paths'][path]:
                 allow_methods = ','.join([m.upper() for m in methods])
@@ -249,22 +250,35 @@ class CorsProcessor(AbstractProcessor):
                         path_param_names.append(parameter['name'])
 
                 for response_code in endpoint['responses']:
-                    for response_header in endpoint['responses'][response_code].get('headers', {}):
-                        if response_header != 'Access-Control-Allow-Origin':
-                            allow_headers.add(response_header)
+                    expose_headers[response_code] = set()
 
                     endpoint['responses'][response_code].setdefault('headers', {})
+
+                    for response_header in endpoint['responses'][response_code]['headers']:
+                        if response_header != 'Access-Control-Allow-Origin' and response_header != 'Access-Control-Expose-Headers':
+                            expose_headers[response_code].add(response_header)
+                    if expose_headers[response_code]:
+                        endpoint['responses'][response_code]['headers']['Access-Control-Expose-Headers'] = {
+                            'schema': {
+                                'type': 'string',
+                                'example': f'{",".join(expose_headers[response_code])}',
+                            }
+                        }
+
                     endpoint['responses'][response_code]['headers']['Access-Control-Allow-Origin'] = {
                         'schema': {
                             'type': 'string',
                             'example': f'{self.allow_origin}',
                         }
                     }
+
                 gw_responses = endpoint['x-amazon-apigateway-integration']['responses']
                 for status_code in gw_responses:
                     gw_responses[status_code].setdefault('responseParameters', {})
-                    gw_responses[status_code]['responseParameters'][
-                        'method.response.header.Access-Control-Allow-Origin'] = f'\'{self.allow_origin}\''
+                    gw_responses[status_code]['responseParameters']['method.response.header.Access-Control-Allow-Origin'] = f'\'{self.allow_origin}\''
+
+                    if expose_headers.get(status_code):
+                        gw_responses[status_code]['responseParameters']['method.response.header.Access-Control-Expose-Headers'] = f'\'{",".join(expose_headers.get(status_code))}\''
 
             if 'options' in schema['paths'][path]:
                 continue
