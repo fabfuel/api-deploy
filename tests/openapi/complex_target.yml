@@ -14,6 +14,8 @@ tags:
   description: Project management
 - name: Vendor
   description: Vendor management
+- name: Static Files
+  description: Static file content
 - name: CORS
   description: CORS configuration endpoints
 paths:
@@ -982,6 +984,108 @@ paths:
         schema:
           type: string
           format: uuid
+  /api.v1.yml:
+    get:
+      tags:
+      - Static Files
+      responses:
+        '200':
+          description: Static file api.v1.yml
+          headers:
+            Access-Control-Allow-Origin:
+              schema:
+                type: string
+                example: 'foo.com'
+      parameters:
+      - name: host
+        in: header
+        required: false
+        schema:
+          type: string
+      - name: authorization
+        in: header
+        required: false
+        schema:
+          type: string
+      - name: x-datadog-trace-id
+        in: header
+        required: false
+        schema:
+          type: string
+      - name: x-datadog-parent-id
+        in: header
+        required: false
+        schema:
+          type: string
+      - name: x-datadog-origin
+        in: header
+        required: false
+        schema:
+          type: string
+      - name: x-datadog-sampling-priority
+        in: header
+        required: false
+        schema:
+          type: string
+      x-amazon-apigateway-integration:
+        type: http
+        connectionId: 1234567890
+        httpMethod: GET
+        uri: https://integration.com/api.v1.yml
+        passthroughBehavior: when_no_match
+        connectionType: VPC_LINK
+        responses:
+          default:
+            statusCode: '500'
+            responseParameters:
+              method.response.header.Access-Control-Allow-Origin: '''foo.com'''
+          '200':
+            statusCode: '200'
+            responseParameters:
+              method.response.header.Access-Control-Allow-Origin: '''foo.com'''
+        requestParameters:
+          integration.request.header.User-Agent: context.identity.userAgent
+          integration.request.header.X-Forwarded-For: context.identity.sourceIp
+          integration.request.header.X-Stage: context.stage
+          integration.request.header.host: method.request.header.host
+          integration.request.header.authorization: method.request.header.authorization
+          integration.request.header.x-datadog-trace-id: method.request.header.x-datadog-trace-id
+          integration.request.header.x-datadog-parent-id: method.request.header.x-datadog-parent-id
+          integration.request.header.x-datadog-origin: method.request.header.x-datadog-origin
+          integration.request.header.x-datadog-sampling-priority: method.request.header.x-datadog-sampling-priority
+    options:
+      operationId: /api.v1.ymlCORS
+      description: /api.v1.yml CORS
+      tags:
+      - CORS
+      responses:
+        '200':
+          description: '200'
+          headers:
+            Access-Control-Allow-Origin:
+              schema:
+                type: string
+                example: 'foo.com'
+            Access-Control-Allow-Methods:
+              schema:
+                type: string
+                example: GET,OPTIONS
+            Access-Control-Allow-Headers:
+              schema:
+                type: string
+                example: authorization,host,x-datadog-origin,x-datadog-parent-id,x-datadog-sampling-priority,x-datadog-trace-id
+      x-amazon-apigateway-integration:
+        responses:
+          default:
+            statusCode: '200'
+            responseParameters:
+              method.response.header.Access-Control-Allow-Headers: '''authorization,host,x-datadog-origin,x-datadog-parent-id,x-datadog-sampling-priority,x-datadog-trace-id'''
+              method.response.header.Access-Control-Allow-Methods: '''GET,OPTIONS'''
+              method.response.header.Access-Control-Allow-Origin: '''foo.com'''
+        requestTemplates:
+          application/json: '{"statusCode": 200}'
+        passthroughBehavior: when_no_match
+        type: mock
 components:
   schemas:
     Health:

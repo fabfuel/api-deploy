@@ -13,7 +13,6 @@ config = Config.from_file(filename)
 @fixture
 def simple_source_file():
     filename = os.path.join(dirname, '../openapi/simple_source.yml')
-    print(filename)
     return Schema.from_file(filename)
 
 

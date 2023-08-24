@@ -15,6 +15,9 @@ class Config(Dict):
             },
             'gateway': {},
             'cors': {},
+            'static': {
+                'files': []
+            },
         }
         default_config['headers']['request'] = config_file.get('headers', {}).get('request', [])
         default_config['headers']['response'] = config_file.get('headers', {}).get('response', [])
@@ -24,6 +27,8 @@ class Config(Dict):
         default_config['gateway'].setdefault('connection_id', config_file.get('gateway', {}).get('connectionId', ''))
 
         default_config['cors'].setdefault('allow_origin', config_file.get('cors', {}).get('origin', '*'))
+
+        default_config['static']['files'] = config_file.get('static', {}).get('files', [])
 
         super().__init__(default_config)
 
