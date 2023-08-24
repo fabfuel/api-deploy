@@ -25,6 +25,7 @@ class ProcessManager:
     @classmethod
     def default(cls, config: Config):
         default_manager = cls()
+        default_manager.register(StaticFileProcessor(**config['static']))
         default_manager.register(PassthroughProcessor(**config['headers']))
         default_manager.register(FlattenProcessor())
         default_manager.register(ApiGatewayProcessor(**config['gateway']))
@@ -370,9 +371,34 @@ class PassthroughProcessor(AbstractProcessor):
                 for header in self.request_headers:
                     self.add_parameter(params, header, 'header')
 
-                # self.add_parameter(params, 'Authorization', 'header', 'Authorization credentials')
-                # self.add_parameter(params, 'X-Datadog-Trace-Id', 'header', 'Unique Datadog Trace ID')
-                # self.add_parameter(params, 'X-Datadog-Parent-Id', 'header', 'Unique Datadog Trace ID')
-                # self.add_parameter(params, 'X-Datadog-Origin', 'header', 'Unique Datadog Trace ID')
+        return schema
+
+
+class StaticFileProcessor(AbstractProcessor):
+
+    def __init__(self, files: [str]) -> None:
+        self.files = files
+        super().__init__()
+
+    def process(self, schema: Schema) -> Schema:
+        if len(self.files) > 0:
+            schema['tags'].append({
+                'description': 'Static file content',
+                'name': 'Static Files'
+            })
+
+        for file in self.files:
+            schema['paths'][f'/{file}'] = {
+                'get': {
+                    'tags': ['Static Files'],
+                    'responses': {
+                        '200': {
+                        'description': f'Static file {file}'
+
+
+                        }
+                    }
+                }
+            }
 
         return schema

@@ -13,3 +13,6 @@ headers:
     - Location
 cors:
   origin: 'foo.com'
+static:
+  files:
+    - api.v1.yml

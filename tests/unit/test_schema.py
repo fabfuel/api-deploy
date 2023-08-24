@@ -15,6 +15,5 @@ def test_schema_from_string():
 def test_schema_from_file():
     dirname = os.path.dirname(__file__)
     filename = os.path.join(dirname, '../openapi/simple_source.yml')
-    print(filename)
     schema = Schema.from_file(filename)
     assert schema['info']['title'] == 'Test'
