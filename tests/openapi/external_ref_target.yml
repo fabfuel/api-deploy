@@ -170,6 +170,14 @@ paths:
               schema:
                 example: foo.com
                 type: string
+            Access-Control-Expose-Headers:
+              schema:
+                example: Content-Type
+                type: string
+            Content-Type:
+              schema:
+                example: text/yaml
+                type: string
       tags:
       - Static Files
       x-amazon-apigateway-integration:
@@ -191,6 +199,8 @@ paths:
           '200':
             responseParameters:
               method.response.header.Access-Control-Allow-Origin: '''foo.com'''
+              method.response.header.Access-Control-Expose-Headers: '''Content-Type'''
+              method.response.header.Content-Type: integration.response.header.Content-Type
             statusCode: '200'
           default:
             responseParameters:

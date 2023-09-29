@@ -996,6 +996,14 @@ paths:
               schema:
                 type: string
                 example: 'foo.com'
+            Access-Control-Expose-Headers:
+              schema:
+                example: Content-Type
+                type: string
+            Content-Type:
+              schema:
+                example: text/yaml
+                type: string
       parameters:
       - name: host
         in: header
@@ -1043,6 +1051,8 @@ paths:
             statusCode: '200'
             responseParameters:
               method.response.header.Access-Control-Allow-Origin: '''foo.com'''
+              method.response.header.Access-Control-Expose-Headers: '''Content-Type'''
+              method.response.header.Content-Type: integration.response.header.Content-Type
         requestParameters:
           integration.request.header.User-Agent: context.identity.userAgent
           integration.request.header.X-Forwarded-For: context.identity.sourceIp

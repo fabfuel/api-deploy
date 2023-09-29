@@ -408,7 +408,15 @@ class StaticFileProcessor(AbstractProcessor):
                     'tags': ['Static Files'],
                     'responses': {
                         '200': {
-                            'description': f'Static file {file}'
+                            'description': f'Static file {file}',
+                            'headers': {
+                                'Content-Type': {
+                                    'schema': {
+                                        'example': 'text/yaml',
+                                        'type': 'string'
+                                    }
+                                }
+                            }
                         }
                     }
                 }
