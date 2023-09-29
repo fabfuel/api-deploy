@@ -34,6 +34,18 @@ def complex_target_file():
     return Schema.from_file(filename)
 
 
+@fixture
+def external_ref_source_file():
+    filename = os.path.join(dirname, '../openapi/external_ref_source.yml')
+    return Schema.from_file(filename)
+
+
+@fixture
+def external_ref_target_file():
+    filename = os.path.join(dirname, '../openapi/external_ref_target.yml')
+    return Schema.from_file(filename)
+
+
 def test_compile_simple(simple_source_file, simple_target_file):
     manager = ProcessManager.default(config)
     processed = manager.process(simple_source_file)
@@ -44,3 +56,9 @@ def test_compile_complex(complex_source_file, complex_target_file):
     manager = ProcessManager.default(config)
     processed = manager.process(complex_source_file)
     assert processed.dump(True) == complex_target_file.dump(True)
+
+
+def test_compile_external_ref(external_ref_source_file, external_ref_target_file):
+    manager = ProcessManager.default(config)
+    processed = manager.process(external_ref_source_file)
+    assert processed.dump(True) == external_ref_target_file.dump(True)

@@ -16,6 +16,8 @@ dependencies = [
     'mergedeep>=1.3.4',
     'boto3>=1.26.118',
     'PyYAML>=6.0',
+    'requests>=2.31.0',
+    'Jinja2==3.1.2',
 ]
 
 setup(

@@ -14,9 +14,9 @@ def api():  # pragma: no cover
 
 
 @click.command('compile')
-@click.argument('config_file')
-@click.argument('source_file')
-@click.argument('target_file')
+@click.argument('config_file', type=click.Path(exists=True, resolve_path=True))
+@click.argument('source_file', type=click.Path(exists=True))
+@click.argument('target_file', type=click.Path(exists=True))
 def compile_file(config_file, source_file, target_file):
     config = Config.from_file(config_file)
     source_schema = Schema.from_file(source_file)
@@ -25,10 +25,10 @@ def compile_file(config_file, source_file, target_file):
 
 
 @click.command()
-@click.argument('config_file')
+@click.argument('config_file', type=click.Path(exists=True))
 @click.argument('api_id')
 @click.argument('stage_name')
-@click.argument('source_file')
+@click.argument('source_file', type=click.Path(exists=True))
 @click.option('--region', required=False, help='AWS region (e.g. eu-central-1)')
 @click.option('--access-key-id', required=False, help='AWS access key id')
 @click.option('--secret-access-key', required=False, help='AWS secret access key')

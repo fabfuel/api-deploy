@@ -5,18 +5,22 @@ from api_deploy.schema import YamlDict
 class ConfigFile(YamlDict):
     ...
 
-
 class Config(Dict):
-    def __init__(self, config_file: ConfigFile) -> None:
+    def __init__(self, config_file: ConfigFile, file_path) -> None:
+        self.file_path = file_path
         default_config = {
             'headers': {
-                'request': {},
-                'response': {},
+                'request': [],
+                'response': [],
             },
             'gateway': {},
             'cors': {},
             'static': {
                 'files': []
+            },
+            'generator': {
+                'output': None,
+                'languages': []
             },
         }
         default_config['headers']['request'] = config_file.get('headers', {}).get('request', [])
@@ -30,9 +34,12 @@ class Config(Dict):
 
         default_config['static']['files'] = config_file.get('static', {}).get('files', [])
 
+        default_config['generator']['output'] = config_file.get('generator', {}).get('output')
+        default_config['generator']['languages'] = config_file.get('generator', {}).get('languages', [])
+
         super().__init__(default_config)
 
     @classmethod
     def from_file(cls, file_path):
         config_file = ConfigFile.from_file(file_path)
-        return cls(config_file)
+        return cls(config_file, file_path)

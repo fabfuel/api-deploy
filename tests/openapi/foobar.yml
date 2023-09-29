@@ -1,0 +1,16 @@
+components:
+  schemas:
+    Foobar:
+      type: object
+      additionalProperties: false
+      properties:
+        name:
+          type: string
+          description: Name of the application
+        datetime:
+          type: string
+          format: date-time
+          description: Current date and time
+        version:
+          type: string
+          description: Current version

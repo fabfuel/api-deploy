@@ -1,20 +1,11 @@
-from abc import ABC, abstractmethod
 from copy import deepcopy
 from mergedeep import merge
+from requests import get
 
 from api_deploy.config import Config
-from api_deploy.schema import Schema
-
-
-class AbstractProcessor(ABC):
-
-    @abstractmethod
-    def __init__(self, **kwargs):
-        ...
-
-    @abstractmethod
-    def process(self, schema: Schema) -> Schema:
-        ...
+from api_deploy.processors.abstract_processor import AbstractProcessor
+from api_deploy.processors.code_generator import CodeGenerator
+from api_deploy.schema import Schema, YamlDict
 
 
 class ProcessManager:
@@ -25,11 +16,12 @@ class ProcessManager:
     @classmethod
     def default(cls, config: Config):
         default_manager = cls()
-        default_manager.register(StaticFileProcessor(**config['static']))
-        default_manager.register(PassthroughProcessor(**config['headers']))
-        default_manager.register(FlattenProcessor())
-        default_manager.register(ApiGatewayProcessor(**config['gateway']))
-        default_manager.register(CorsProcessor(headers=config['headers'], **config['cors']))
+        default_manager.register(StaticFileProcessor(config, **config['static']))
+        default_manager.register(FlattenProcessor(config))
+        default_manager.register(PassthroughProcessor(config, **config['headers']))
+        default_manager.register(ApiGatewayProcessor(config, **config['gateway']))
+        default_manager.register(CorsProcessor(config, headers=config['headers'], **config['cors']))
+        default_manager.register(CodeGenerator(config, **config['generator']))
         return default_manager
 
     def register(self, processor: AbstractProcessor):
@@ -46,9 +38,10 @@ class ProcessManager:
 
 class FlattenProcessor(AbstractProcessor):
 
-    def __init__(self, **kwargs) -> None:
-        super().__init__()
+    def __init__(self, config: Config, **kwargs) -> None:
+        super().__init__(config)
         self.used_refs = set()
+        self.external_schemas = {}
 
     def process(self, source: Schema) -> Schema:
         target = deepcopy(source)
@@ -61,7 +54,9 @@ class FlattenProcessor(AbstractProcessor):
         self.replace_refs_dict(target['components'], target)
         self.replace_refs_dict(target['components'], target)
 
-        # Replace $refs in paths
+        # Replace $refs in paths – run thrice to catch all nesting
+        self.replace_refs_dict(target['paths'], target)
+        self.replace_refs_dict(target['paths'], target)
         self.replace_refs_dict(target['paths'], target)
 
         try:
@@ -78,7 +73,7 @@ class FlattenProcessor(AbstractProcessor):
         return target
 
     def replace_refs_dict(self, node, schema, replace_ref=True, enforce_replace=False):
-        if self.is_ref(node) and (replace_ref or enforce_replace):
+        if self.is_ref(node) and (replace_ref or enforce_replace or self.is_external_ref(node)):
             return self.lookup_ref(node, schema)
         elif self.is_ref(node):
             self.used_refs.add(self.get_ref_model_name(node['$ref']))
@@ -88,6 +83,7 @@ class FlattenProcessor(AbstractProcessor):
             if type(node[key]) is dict:
                 # Do not replace main level refs (response models)
                 replace_ref = key != 'schema'
+                # replace_ref = True
                 node[key] = self.replace_refs_dict(node[key], schema, replace_ref, enforce_replace)
             if type(node[key]) is list:
                 node[key] = self.replace_refs_list(node[key], schema)
@@ -105,11 +101,41 @@ class FlattenProcessor(AbstractProcessor):
     def get_ref_model_name(ref):
         return ref.split('/')[-1]
 
-    @staticmethod
-    def lookup_ref(ref: dict, schema: Schema):
+    def get_external_schema(self, url):
+        if not self.external_schemas.get(url):
+            response = get(url)
+            self.external_schemas[url] = YamlDict(response.text)
+
+        return self.external_schemas[url]
+
+    def lookup_ref(self, ref: dict, schema: Schema):
         name = ref['$ref']
+        if name.startswith('http'):
+            file_url, path = name.split('#')
+            path_parts = path.strip('/').split('/')
+            external_schema = self.get_external_schema(file_url)
+
+            # Copy all schemas from external schema for later ref resolution
+            if external_schema.get('components', {}).get('schemas'):
+                schema['components']['schemas'] = external_schema['components']['schemas'] | schema['components']['schemas']
+
+            for part in path_parts:
+                part_encoded = part.replace('~1', '/').replace('~0', '~')
+                external_schema = external_schema[part_encoded]
+            return external_schema
+
         components, component_type, model = name.split('/')[1:]
-        return schema[components][component_type].get(model)
+
+        model_schema = schema[components][component_type].get(model)
+
+        if not model_schema:
+            for external_schema in self.external_schemas:
+                model_schema = self.external_schemas[external_schema][components][component_type].get(model)
+
+        if not model_schema:
+            raise TypeError(f'Unknown model: {model} [{name}]')
+
+        return model_schema
 
     @staticmethod
     def first_key(node):
@@ -120,6 +146,9 @@ class FlattenProcessor(AbstractProcessor):
 
     def is_ref(self, node):
         return self.first_key(node) == '$ref'
+
+    def is_external_ref(self, node):
+        return self.is_ref(node) and node['$ref'].startswith('http')
 
     def is_all_of(self, node):
         return self.first_key(node) == 'allOf'
@@ -145,8 +174,8 @@ class FlattenProcessor(AbstractProcessor):
 
 
 class ApiGatewayProcessor(AbstractProcessor):
-    def __init__(self, integration_host, connection_id, **kwargs) -> None:
-        super().__init__()
+    def __init__(self, config: Config, integration_host, connection_id, **kwargs) -> None:
+        super().__init__(config)
         self.integration_host = integration_host
         self.connection_id = connection_id
 
@@ -219,8 +248,8 @@ class ApiGatewayProcessor(AbstractProcessor):
 
 
 class CorsProcessor(AbstractProcessor):
-    def __init__(self, headers, allow_origin, **kwargs) -> None:
-        super().__init__()
+    def __init__(self, config: Config, headers, allow_origin, **kwargs) -> None:
+        super().__init__(config)
         self.allow_headers = headers['request']
         self.allow_origin = allow_origin
 
@@ -276,10 +305,12 @@ class CorsProcessor(AbstractProcessor):
                 gw_responses = endpoint['x-amazon-apigateway-integration']['responses']
                 for status_code in gw_responses:
                     gw_responses[status_code].setdefault('responseParameters', {})
-                    gw_responses[status_code]['responseParameters']['method.response.header.Access-Control-Allow-Origin'] = f'\'{self.allow_origin}\''
+                    gw_responses[status_code]['responseParameters'][
+                        'method.response.header.Access-Control-Allow-Origin'] = f'\'{self.allow_origin}\''
 
                     if expose_headers.get(status_code):
-                        gw_responses[status_code]['responseParameters']['method.response.header.Access-Control-Expose-Headers'] = f'\'{",".join(expose_headers.get(status_code))}\''
+                        gw_responses[status_code]['responseParameters'][
+                            'method.response.header.Access-Control-Expose-Headers'] = f'\'{",".join(expose_headers.get(status_code))}\''
 
             if 'options' in schema['paths'][path]:
                 continue
@@ -343,10 +374,10 @@ class CorsProcessor(AbstractProcessor):
 
 
 class PassthroughProcessor(AbstractProcessor):
-    def __init__(self, request, response, **kwargs) -> None:
+    def __init__(self, config: Config, request, response, **kwargs) -> None:
         self.request_headers: [str] = request
         self.response_headers: [str] = response
-        super().__init__()
+        super().__init__(config)
 
     @staticmethod
     def add_parameter(params_list, name, location, description=None):
@@ -365,6 +396,8 @@ class PassthroughProcessor(AbstractProcessor):
     def process(self, schema: Schema) -> Schema:
         for path in schema['paths']:
             for method in schema['paths'][path]:
+                if method == '$ref':
+                    continue
                 endpoint = schema['paths'][path][method]
                 params = endpoint.setdefault('parameters', [])
 
@@ -376,9 +409,10 @@ class PassthroughProcessor(AbstractProcessor):
 
 class StaticFileProcessor(AbstractProcessor):
 
-    def __init__(self, files: [str]) -> None:
+    def __init__(self, config: Config, files: [str]) -> None:
+        self.config = config
         self.files = files
-        super().__init__()
+        super().__init__(config)
 
     def process(self, schema: Schema) -> Schema:
         if len(self.files) > 0:
@@ -393,9 +427,15 @@ class StaticFileProcessor(AbstractProcessor):
                     'tags': ['Static Files'],
                     'responses': {
                         '200': {
-                        'description': f'Static file {file}'
-
-
+                            'description': f'Static file {file}',
+                            'headers': {
+                                'Content-Type': {
+                                    'schema': {
+                                        'example': 'text/yaml',
+                                        'type': 'string'
+                                    }
+                                }
+                            }
                         }
                     }
                 }
