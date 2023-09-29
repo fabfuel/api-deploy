@@ -1,0 +1,33 @@
+openapi: "3.0.1"
+info:
+  description: "Test API"
+  title: "Test"
+  version: "1"
+  contact:
+    name: Fabian Fuelling
+    email: api@fabfuel.de
+servers:
+  - url: "https://api.fabfuel.de/test"
+  - url: "https://api-staging.fabfuel.de/test"
+tags:
+  - name: Health
+    description: Ping and health check endpoints
+
+paths:
+  /-/ping:
+    get:
+      operationId: ping
+      description: Receive a ping response
+      tags:
+        - Health
+      responses:
+        "200":
+          description: Ping
+          content:
+            application/json:
+              schema:
+                $ref: https://raw.githubusercontent.com/fabfuel/api-deploy/develop/tests/openapi/foobar.yml#/components/schemas/Foobar
+
+components:
+  schemas: {}
+  parameters: {}

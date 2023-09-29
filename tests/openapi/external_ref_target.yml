@@ -1,0 +1,244 @@
+components:
+  schemas: {}
+info:
+  contact:
+    email: api@fabfuel.de
+    name: Fabian Fuelling
+  description: Test API
+  title: Test
+  version: '1'
+openapi: 3.0.1
+paths:
+  /-/ping:
+    get:
+      description: Receive a ping response
+      operationId: ping
+      parameters:
+      - in: header
+        name: host
+        required: false
+        schema:
+          type: string
+      - in: header
+        name: authorization
+        required: false
+        schema:
+          type: string
+      - in: header
+        name: x-datadog-trace-id
+        required: false
+        schema:
+          type: string
+      - in: header
+        name: x-datadog-parent-id
+        required: false
+        schema:
+          type: string
+      - in: header
+        name: x-datadog-origin
+        required: false
+        schema:
+          type: string
+      - in: header
+        name: x-datadog-sampling-priority
+        required: false
+        schema:
+          type: string
+      responses:
+        '200':
+          description: Ping
+          content:
+            application/json:
+              schema:
+                type: object
+                additionalProperties: false
+                properties:
+                  name:
+                    type: string
+                    description: Name of the application
+                  datetime:
+                    type: string
+                    format: date-time
+                    description: Current date and time
+                  version:
+                    type: string
+                    description: Current version
+          headers:
+            Access-Control-Allow-Origin:
+              schema:
+                example: foo.com
+                type: string
+      tags:
+      - Health
+      x-amazon-apigateway-integration:
+        connectionId: 1234567890
+        connectionType: VPC_LINK
+        httpMethod: GET
+        passthroughBehavior: when_no_match
+        requestParameters:
+          integration.request.header.User-Agent: context.identity.userAgent
+          integration.request.header.X-Forwarded-For: context.identity.sourceIp
+          integration.request.header.X-Stage: context.stage
+          integration.request.header.authorization: method.request.header.authorization
+          integration.request.header.host: method.request.header.host
+          integration.request.header.x-datadog-origin: method.request.header.x-datadog-origin
+          integration.request.header.x-datadog-parent-id: method.request.header.x-datadog-parent-id
+          integration.request.header.x-datadog-sampling-priority: method.request.header.x-datadog-sampling-priority
+          integration.request.header.x-datadog-trace-id: method.request.header.x-datadog-trace-id
+        responses:
+          '200':
+            responseParameters:
+              method.response.header.Access-Control-Allow-Origin: '''foo.com'''
+            statusCode: '200'
+          default:
+            responseParameters:
+              method.response.header.Access-Control-Allow-Origin: '''foo.com'''
+            statusCode: '500'
+        type: http
+        uri: https://integration.com/-/ping
+    options:
+      description: /-/ping CORS
+      operationId: /-/pingCORS
+      responses:
+        '200':
+          description: '200'
+          headers:
+            Access-Control-Allow-Headers:
+              schema:
+                example: authorization,host,x-datadog-origin,x-datadog-parent-id,x-datadog-sampling-priority,x-datadog-trace-id
+                type: string
+            Access-Control-Allow-Methods:
+              schema:
+                example: GET,OPTIONS
+                type: string
+            Access-Control-Allow-Origin:
+              schema:
+                example: foo.com
+                type: string
+      tags:
+      - CORS
+      x-amazon-apigateway-integration:
+        passthroughBehavior: when_no_match
+        requestTemplates:
+          application/json: '{"statusCode": 200}'
+        responses:
+          default:
+            responseParameters:
+              method.response.header.Access-Control-Allow-Headers: '''authorization,host,x-datadog-origin,x-datadog-parent-id,x-datadog-sampling-priority,x-datadog-trace-id'''
+              method.response.header.Access-Control-Allow-Methods: '''GET,OPTIONS'''
+              method.response.header.Access-Control-Allow-Origin: '''foo.com'''
+            statusCode: '200'
+        type: mock
+  /api.v1.yml:
+    get:
+      parameters:
+      - in: header
+        name: host
+        required: false
+        schema:
+          type: string
+      - in: header
+        name: authorization
+        required: false
+        schema:
+          type: string
+      - in: header
+        name: x-datadog-trace-id
+        required: false
+        schema:
+          type: string
+      - in: header
+        name: x-datadog-parent-id
+        required: false
+        schema:
+          type: string
+      - in: header
+        name: x-datadog-origin
+        required: false
+        schema:
+          type: string
+      - in: header
+        name: x-datadog-sampling-priority
+        required: false
+        schema:
+          type: string
+      responses:
+        '200':
+          description: Static file api.v1.yml
+          headers:
+            Access-Control-Allow-Origin:
+              schema:
+                example: foo.com
+                type: string
+      tags:
+      - Static Files
+      x-amazon-apigateway-integration:
+        connectionId: 1234567890
+        connectionType: VPC_LINK
+        httpMethod: GET
+        passthroughBehavior: when_no_match
+        requestParameters:
+          integration.request.header.User-Agent: context.identity.userAgent
+          integration.request.header.X-Forwarded-For: context.identity.sourceIp
+          integration.request.header.X-Stage: context.stage
+          integration.request.header.authorization: method.request.header.authorization
+          integration.request.header.host: method.request.header.host
+          integration.request.header.x-datadog-origin: method.request.header.x-datadog-origin
+          integration.request.header.x-datadog-parent-id: method.request.header.x-datadog-parent-id
+          integration.request.header.x-datadog-sampling-priority: method.request.header.x-datadog-sampling-priority
+          integration.request.header.x-datadog-trace-id: method.request.header.x-datadog-trace-id
+        responses:
+          '200':
+            responseParameters:
+              method.response.header.Access-Control-Allow-Origin: '''foo.com'''
+            statusCode: '200'
+          default:
+            responseParameters:
+              method.response.header.Access-Control-Allow-Origin: '''foo.com'''
+            statusCode: '500'
+        type: http
+        uri: https://integration.com/api.v1.yml
+    options:
+      description: /api.v1.yml CORS
+      operationId: /api.v1.ymlCORS
+      responses:
+        '200':
+          description: '200'
+          headers:
+            Access-Control-Allow-Headers:
+              schema:
+                example: authorization,host,x-datadog-origin,x-datadog-parent-id,x-datadog-sampling-priority,x-datadog-trace-id
+                type: string
+            Access-Control-Allow-Methods:
+              schema:
+                example: GET,OPTIONS
+                type: string
+            Access-Control-Allow-Origin:
+              schema:
+                example: foo.com
+                type: string
+      tags:
+      - CORS
+      x-amazon-apigateway-integration:
+        passthroughBehavior: when_no_match
+        requestTemplates:
+          application/json: '{"statusCode": 200}'
+        responses:
+          default:
+            responseParameters:
+              method.response.header.Access-Control-Allow-Headers: '''authorization,host,x-datadog-origin,x-datadog-parent-id,x-datadog-sampling-priority,x-datadog-trace-id'''
+              method.response.header.Access-Control-Allow-Methods: '''GET,OPTIONS'''
+              method.response.header.Access-Control-Allow-Origin: '''foo.com'''
+            statusCode: '200'
+        type: mock
+servers:
+- url: https://api.fabfuel.de/test
+tags:
+- description: Ping and health check endpoints
+  name: Health
+- description: Static file content
+  name: Static Files
+- description: CORS configuration endpoints
+  name: CORS
+x-amazon-apigateway-request-validators: {}
+

@@ -16,6 +16,7 @@ dependencies = [
     'mergedeep>=1.3.4',
     'boto3>=1.26.118',
     'PyYAML>=6.0',
+    'requests>=2.28.2',
 ]
 
 setup(

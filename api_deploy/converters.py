@@ -1,9 +1,10 @@
 from abc import ABC, abstractmethod
 from copy import deepcopy
 from mergedeep import merge
+from requests import get
 
 from api_deploy.config import Config
-from api_deploy.schema import Schema
+from api_deploy.schema import Schema, YamlDict
 
 
 class AbstractProcessor(ABC):
@@ -78,7 +79,7 @@ class FlattenProcessor(AbstractProcessor):
         return target
 
     def replace_refs_dict(self, node, schema, replace_ref=True, enforce_replace=False):
-        if self.is_ref(node) and (replace_ref or enforce_replace):
+        if self.is_ref(node) and (replace_ref or enforce_replace or self.is_external_ref(node)):
             return self.lookup_ref(node, schema)
         elif self.is_ref(node):
             self.used_refs.add(self.get_ref_model_name(node['$ref']))
@@ -108,6 +109,15 @@ class FlattenProcessor(AbstractProcessor):
     @staticmethod
     def lookup_ref(ref: dict, schema: Schema):
         name = ref['$ref']
+        if name.startswith('http'):
+            file_url, path = name.split('#')
+            path_parts = path.strip('/').split('/')
+            response = get(file_url)
+            model = YamlDict(response.text)
+            for part in path_parts:
+                model = model[part]
+            return model
+
         components, component_type, model = name.split('/')[1:]
         return schema[components][component_type].get(model)
 
@@ -120,6 +130,9 @@ class FlattenProcessor(AbstractProcessor):
 
     def is_ref(self, node):
         return self.first_key(node) == '$ref'
+
+    def is_external_ref(self, node):
+        return self.is_ref(node) and node['$ref'].startswith('http')
 
     def is_all_of(self, node):
         return self.first_key(node) == 'allOf'
@@ -276,10 +289,12 @@ class CorsProcessor(AbstractProcessor):
                 gw_responses = endpoint['x-amazon-apigateway-integration']['responses']
                 for status_code in gw_responses:
                     gw_responses[status_code].setdefault('responseParameters', {})
-                    gw_responses[status_code]['responseParameters']['method.response.header.Access-Control-Allow-Origin'] = f'\'{self.allow_origin}\''
+                    gw_responses[status_code]['responseParameters'][
+                        'method.response.header.Access-Control-Allow-Origin'] = f'\'{self.allow_origin}\''
 
                     if expose_headers.get(status_code):
-                        gw_responses[status_code]['responseParameters']['method.response.header.Access-Control-Expose-Headers'] = f'\'{",".join(expose_headers.get(status_code))}\''
+                        gw_responses[status_code]['responseParameters'][
+                            'method.response.header.Access-Control-Expose-Headers'] = f'\'{",".join(expose_headers.get(status_code))}\''
 
             if 'options' in schema['paths'][path]:
                 continue
@@ -393,9 +408,7 @@ class StaticFileProcessor(AbstractProcessor):
                     'tags': ['Static Files'],
                     'responses': {
                         '200': {
-                        'description': f'Static file {file}'
-
-
+                            'description': f'Static file {file}'
                         }
                     }
                 }
