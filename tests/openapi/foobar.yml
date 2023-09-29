@@ -1,5 +1,5 @@
 components:
-  schemas
+  schemas:
     Foobar:
       type: object
       additionalProperties: false
