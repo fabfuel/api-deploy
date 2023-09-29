@@ -16,3 +16,7 @@ cors:
 static:
   files:
     - api.v1.yml
+generator:
+  output: generated
+  languages:
+    - typescript

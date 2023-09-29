@@ -1,0 +1,7 @@
+// THIS FILE IS GENERATED. DO NOT EDIT.
+
+{% if response_code %}
+type {{ operation_id[0]|upper}}{{operation_id[1:] }}{{ response_code }}Response = {% include 'typescript.object.jinja2' %};
+{% else %}
+type {{ operation_id[0]|upper}}{{operation_id[1:] }}Request = {% include 'typescript.object.jinja2' %};
+{% endif %}

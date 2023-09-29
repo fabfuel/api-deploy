@@ -1,21 +1,11 @@
-from abc import ABC, abstractmethod
 from copy import deepcopy
 from mergedeep import merge
 from requests import get
 
 from api_deploy.config import Config
+from api_deploy.processors.abstract_processor import AbstractProcessor
+from api_deploy.processors.code_generator import CodeGenerator
 from api_deploy.schema import Schema, YamlDict
-
-
-class AbstractProcessor(ABC):
-
-    @abstractmethod
-    def __init__(self, **kwargs):
-        ...
-
-    @abstractmethod
-    def process(self, schema: Schema) -> Schema:
-        ...
 
 
 class ProcessManager:
@@ -26,11 +16,12 @@ class ProcessManager:
     @classmethod
     def default(cls, config: Config):
         default_manager = cls()
-        default_manager.register(StaticFileProcessor(**config['static']))
-        default_manager.register(FlattenProcessor())
-        default_manager.register(PassthroughProcessor(**config['headers']))
-        default_manager.register(ApiGatewayProcessor(**config['gateway']))
-        default_manager.register(CorsProcessor(headers=config['headers'], **config['cors']))
+        default_manager.register(StaticFileProcessor(config, **config['static']))
+        default_manager.register(FlattenProcessor(config))
+        default_manager.register(PassthroughProcessor(config, **config['headers']))
+        default_manager.register(ApiGatewayProcessor(config, **config['gateway']))
+        default_manager.register(CorsProcessor(config, headers=config['headers'], **config['cors']))
+        default_manager.register(CodeGenerator(config, **config['generator']))
         return default_manager
 
     def register(self, processor: AbstractProcessor):
@@ -47,8 +38,8 @@ class ProcessManager:
 
 class FlattenProcessor(AbstractProcessor):
 
-    def __init__(self, **kwargs) -> None:
-        super().__init__()
+    def __init__(self, config: Config, **kwargs) -> None:
+        super().__init__(config)
         self.used_refs = set()
         self.external_schemas = {}
 
@@ -183,8 +174,8 @@ class FlattenProcessor(AbstractProcessor):
 
 
 class ApiGatewayProcessor(AbstractProcessor):
-    def __init__(self, integration_host, connection_id, **kwargs) -> None:
-        super().__init__()
+    def __init__(self, config: Config, integration_host, connection_id, **kwargs) -> None:
+        super().__init__(config)
         self.integration_host = integration_host
         self.connection_id = connection_id
 
@@ -257,8 +248,8 @@ class ApiGatewayProcessor(AbstractProcessor):
 
 
 class CorsProcessor(AbstractProcessor):
-    def __init__(self, headers, allow_origin, **kwargs) -> None:
-        super().__init__()
+    def __init__(self, config: Config, headers, allow_origin, **kwargs) -> None:
+        super().__init__(config)
         self.allow_headers = headers['request']
         self.allow_origin = allow_origin
 
@@ -383,10 +374,10 @@ class CorsProcessor(AbstractProcessor):
 
 
 class PassthroughProcessor(AbstractProcessor):
-    def __init__(self, request, response, **kwargs) -> None:
+    def __init__(self, config: Config, request, response, **kwargs) -> None:
         self.request_headers: [str] = request
         self.response_headers: [str] = response
-        super().__init__()
+        super().__init__(config)
 
     @staticmethod
     def add_parameter(params_list, name, location, description=None):
@@ -418,9 +409,10 @@ class PassthroughProcessor(AbstractProcessor):
 
 class StaticFileProcessor(AbstractProcessor):
 
-    def __init__(self, files: [str]) -> None:
+    def __init__(self, config: Config, files: [str]) -> None:
+        self.config = config
         self.files = files
-        super().__init__()
+        super().__init__(config)
 
     def process(self, schema: Schema) -> Schema:
         if len(self.files) > 0:

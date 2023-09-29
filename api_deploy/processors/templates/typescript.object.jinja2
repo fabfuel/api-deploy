@@ -1,0 +1,14 @@
+{
+{%- for property in properties %}
+  /**
+    * {{ property.name }}
+{%- if property.example %}
+    * Example: {{ property.example }}
+{%- endif %}
+    */
+  {{ property.name }}{{ '?' if not property.required }}: {% if property.types == ['object'] -%}{% with properties=property.properties %}
+    {% include 'typescript.object.jinja2' %}
+{%- endwith -%}{%- else -%}{{ property.types|join(' | ') }}{%- endif -%}{%- if property.is_array -%}[]{%- endif -%};
+
+{%- endfor %}
+}
