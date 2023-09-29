@@ -18,6 +18,7 @@ dependencies = [
     'PyYAML>=6.0',
     'requests>=2.31.0',
     'Jinja2==3.1.2',
+    'urllib3<2',
 ]
 
 setup(
