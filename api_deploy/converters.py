@@ -27,8 +27,8 @@ class ProcessManager:
     def default(cls, config: Config):
         default_manager = cls()
         default_manager.register(StaticFileProcessor(**config['static']))
-        default_manager.register(PassthroughProcessor(**config['headers']))
         default_manager.register(FlattenProcessor())
+        default_manager.register(PassthroughProcessor(**config['headers']))
         default_manager.register(ApiGatewayProcessor(**config['gateway']))
         default_manager.register(CorsProcessor(headers=config['headers'], **config['cors']))
         return default_manager
@@ -50,6 +50,7 @@ class FlattenProcessor(AbstractProcessor):
     def __init__(self, **kwargs) -> None:
         super().__init__()
         self.used_refs = set()
+        self.external_schemas = {}
 
     def process(self, source: Schema) -> Schema:
         target = deepcopy(source)
@@ -62,7 +63,9 @@ class FlattenProcessor(AbstractProcessor):
         self.replace_refs_dict(target['components'], target)
         self.replace_refs_dict(target['components'], target)
 
-        # Replace $refs in paths
+        # Replace $refs in paths – run thrice to catch all nesting
+        self.replace_refs_dict(target['paths'], target)
+        self.replace_refs_dict(target['paths'], target)
         self.replace_refs_dict(target['paths'], target)
 
         try:
@@ -89,6 +92,7 @@ class FlattenProcessor(AbstractProcessor):
             if type(node[key]) is dict:
                 # Do not replace main level refs (response models)
                 replace_ref = key != 'schema'
+                # replace_ref = True
                 node[key] = self.replace_refs_dict(node[key], schema, replace_ref, enforce_replace)
             if type(node[key]) is list:
                 node[key] = self.replace_refs_list(node[key], schema)
@@ -106,20 +110,41 @@ class FlattenProcessor(AbstractProcessor):
     def get_ref_model_name(ref):
         return ref.split('/')[-1]
 
-    @staticmethod
-    def lookup_ref(ref: dict, schema: Schema):
+    def get_external_schema(self, url):
+        if not self.external_schemas.get(url):
+            response = get(url)
+            self.external_schemas[url] = YamlDict(response.text)
+
+        return self.external_schemas[url]
+
+    def lookup_ref(self, ref: dict, schema: Schema):
         name = ref['$ref']
         if name.startswith('http'):
             file_url, path = name.split('#')
             path_parts = path.strip('/').split('/')
-            response = get(file_url)
-            model = YamlDict(response.text)
+            external_schema = self.get_external_schema(file_url)
+
+            # Copy all schemas from external schema for later ref resolution
+            if external_schema.get('components', {}).get('schemas'):
+                schema['components']['schemas'] = external_schema['components']['schemas'] | schema['components']['schemas']
+
             for part in path_parts:
-                model = model[part]
-            return model
+                part_encoded = part.replace('~1', '/').replace('~0', '~')
+                external_schema = external_schema[part_encoded]
+            return external_schema
 
         components, component_type, model = name.split('/')[1:]
-        return schema[components][component_type].get(model)
+
+        model_schema = schema[components][component_type].get(model)
+
+        if not model_schema:
+            for external_schema in self.external_schemas:
+                model_schema = self.external_schemas[external_schema][components][component_type].get(model)
+
+        if not model_schema:
+            raise TypeError(f'Unknown model: {model} [{name}]')
+
+        return model_schema
 
     @staticmethod
     def first_key(node):
@@ -380,6 +405,8 @@ class PassthroughProcessor(AbstractProcessor):
     def process(self, schema: Schema) -> Schema:
         for path in schema['paths']:
             for method in schema['paths'][path]:
+                if method == '$ref':
+                    continue
                 endpoint = schema['paths'][path][method]
                 params = endpoint.setdefault('parameters', [])
 
