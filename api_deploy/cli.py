@@ -29,6 +29,7 @@ def compile_file(config_file, source_file, target_file):
 @click.argument('api_id')
 @click.argument('stage_name')
 @click.argument('source_file', type=click.Path(exists=True))
+@click.option("--no-compile", is_flag=True, show_default=True, default=False, help="No compilation before deployment")
 @click.option('--region', required=False, help='AWS region (e.g. eu-central-1)')
 @click.option('--access-key-id', required=False, help='AWS access key id')
 @click.option('--secret-access-key', required=False, help='AWS secret access key')
@@ -39,6 +40,7 @@ def deploy(config_file,
            api_id,
            stage_name,
            source_file,
+           no_compile,
            region,
            access_key_id,
            secret_access_key,
@@ -48,14 +50,17 @@ def deploy(config_file,
            ):
     client = _get_client(access_key_id, secret_access_key, region, profile, account, assume_role)
     config = Config.from_file(config_file)
+    source_schema = Schema.from_file(source_file)
 
     click.secho(f'Deploying API "{api_id}", stage "{stage_name}"\n')
-    click.secho(f'Compiling OpenAPI file: "{source_file}"')
 
-    source_schema = Schema.from_file(source_file)
-    target_schema = _compile(source_schema, config)
+    if no_compile:
+        target_schema = source_schema
+    else:
+        click.secho(f'Compiling OpenAPI file: "{source_file}"')
+        target_schema = _compile(source_schema, config)
+        click.secho('Successfully compiled OpenAPI file.\n', fg='green')
 
-    click.secho('Successfully compiled OpenAPI file.\n', fg='green')
     click.secho(f'Importing OpenAPI file to API Gateway "{api_id}"')
 
     client.import_openapi(target_schema, api_id)
