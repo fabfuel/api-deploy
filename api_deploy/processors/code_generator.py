@@ -52,6 +52,11 @@ class CodeGenerator(AbstractProcessor):
         config_path = os.path.dirname(self.config.file_path)
         output_path = os.path.join(config_path, self.output_path)
 
+        try:
+            os.mkdir(output_path)
+        except FileExistsError:
+            ...
+
         environment = jinja2.Environment(loader=jinja2.FileSystemLoader(template_path))
         template = environment.get_template(f"{language}.jinja2")
 
