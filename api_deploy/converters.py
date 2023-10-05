@@ -40,6 +40,7 @@ class FlattenProcessor(AbstractProcessor):
 
     def __init__(self, config: Config, **kwargs) -> None:
         super().__init__(config)
+        self.base_url = None
         self.used_refs = set()
         self.external_schemas = {}
 
@@ -108,21 +109,33 @@ class FlattenProcessor(AbstractProcessor):
 
         return self.external_schemas[url]
 
+    def fetch_from_external_schema(self, name, schema):
+        file_url, path = name.split('#')
+        path_parts = path.strip('/').split('/')
+        external_schema = self.get_external_schema(file_url)
+
+        # Copy all schemas from external schema for later ref resolution
+        if (external_schema.get('components') or {}).get('schemas', {}):
+            schema['components']['schemas'] = external_schema['components']['schemas'] | schema['components']['schemas']
+
+        for part in path_parts:
+            part_encoded = part.replace('~1', '/').replace('~0', '~')
+            external_schema = external_schema.get(part_encoded)
+        return external_schema
+
     def lookup_ref(self, ref: dict, schema: Schema):
         name = ref['$ref']
-        if name.startswith('http'):
-            file_url, path = name.split('#')
-            path_parts = path.strip('/').split('/')
-            external_schema = self.get_external_schema(file_url)
 
-            # Copy all schemas from external schema for later ref resolution
-            if external_schema.get('components', {}).get('schemas'):
-                schema['components']['schemas'] = external_schema['components']['schemas'] | schema['components']['schemas']
-
-            for part in path_parts:
-                part_encoded = part.replace('~1', '/').replace('~0', '~')
-                external_schema = external_schema[part_encoded]
-            return external_schema
+        if name.startswith('http') and '#' in name:
+            self.base_url, file = name.rsplit('/', 1)
+            return self.fetch_from_external_schema(name, schema)
+        elif name.startswith('http'):
+            self.base_url, file = name.rsplit('/', 1)
+            schema = self.get_external_schema(name)
+            return schema.copy()
+        elif name.startswith('.'):
+            url = self.base_url + '/' + name
+            return self.get_external_schema(url).copy()
 
         components, component_type, model = name.split('/')[1:]
 
@@ -148,7 +161,7 @@ class FlattenProcessor(AbstractProcessor):
         return self.first_key(node) == '$ref'
 
     def is_external_ref(self, node):
-        return self.is_ref(node) and node['$ref'].startswith('http')
+        return self.is_ref(node) and (node['$ref'].startswith('http') or node['$ref'].startswith('.'))
 
     def is_all_of(self, node):
         return self.first_key(node) == 'allOf'
