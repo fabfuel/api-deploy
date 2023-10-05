@@ -16,7 +16,7 @@ def api():  # pragma: no cover
 @click.command('compile')
 @click.argument('config_file', type=click.Path(exists=True, resolve_path=True))
 @click.argument('source_file', type=click.Path(exists=True))
-@click.argument('target_file', type=click.Path(exists=True))
+@click.argument('target_file', type=click.Path(exists=False))
 def compile_file(config_file, source_file, target_file):
     config = Config.from_file(config_file)
     source_schema = Schema.from_file(source_file)

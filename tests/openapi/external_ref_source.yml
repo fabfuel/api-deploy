@@ -14,19 +14,10 @@ tags:
     description: Ping and health check endpoints
 
 paths:
+  /-/health:
+    $ref: 'https://api-staging.packmatic.io/types/endpoints/health.yml'
   /-/ping:
-    get:
-      operationId: ping
-      description: Receive a ping response
-      tags:
-        - Health
-      responses:
-        "200":
-          description: Ping
-          content:
-            application/json:
-              schema:
-                $ref: https://raw.githubusercontent.com/fabfuel/api-deploy/develop/tests/openapi/foobar.yml#/components/schemas/Foobar
+    $ref: 'https://api-staging.packmatic.io/types/endpoints/ping.yml'
 
 components:
   schemas: {}
