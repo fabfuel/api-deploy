@@ -91,6 +91,8 @@ class CodeGenerator(AbstractProcessor):
                         processed_enum.append(f"null")
                     elif property_schema['type'] == 'string':
                         processed_enum.append(f"'{enum}'")
+                    else:
+                        processed_enum.append(enum)
 
             if property_schema['type'] == 'integer':
                 types = ['number']

@@ -80,6 +80,15 @@ components:
             - machine
             - human
             - other
+        priority:
+          type: integer
+          default: 0
+          enum:
+            - 0
+            - 10
+            - 20
+            - 30
+            - 40
 
     Timestamp:
       type: string
