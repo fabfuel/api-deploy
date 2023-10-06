@@ -59,6 +59,7 @@ components:
         - ping
         - pingAt
         - pingBy
+        - category
       properties:
         ping:
           type: string
@@ -67,6 +68,18 @@ components:
           $ref: "#/components/schemas/UserIdentity"
         pingAt:
           $ref: "#/components/schemas/Timestamp"
+        locations:
+          type: array
+          items:
+            type: string
+        category:
+          type: string
+          nullable: true
+          enum:
+            - null
+            - machine
+            - human
+            - other
 
     Timestamp:
       type: string
