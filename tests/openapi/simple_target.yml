@@ -449,6 +449,15 @@ components:
           - human
           - other
           type: string
+        priority:
+          type: integer
+          default: 0
+          enum:
+            - 0
+            - 10
+            - 20
+            - 30
+            - 40
     ErrorResponse:
       type: object
       required:
