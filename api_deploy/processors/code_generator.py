@@ -84,6 +84,14 @@ class CodeGenerator(AbstractProcessor):
             if writeOnly and property_schema.get('readOnly') is True:
                 continue
 
+            processed_enum = []
+            if property_schema.get('enum'):
+                for enum in property_schema['enum']:
+                    if enum is None:
+                        processed_enum.append(f"null")
+                    elif property_schema['type'] == 'string':
+                        processed_enum.append(f"'{enum}'")
+
             if property_schema['type'] == 'integer':
                 types = ['number']
                 sub_properties = []
@@ -108,6 +116,7 @@ class CodeGenerator(AbstractProcessor):
                 'example': property_schema.get('example', ''),
                 'is_array': property_schema['type'] == 'array',
                 'properties': sub_properties,
+                'enum': processed_enum,
             })
 
         return properties

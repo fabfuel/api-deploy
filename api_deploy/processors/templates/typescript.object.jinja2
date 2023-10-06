@@ -6,9 +6,23 @@
     * Example: {{ property.example }}
 {%- endif %}
     */
-  {{ property.name }}{{ '?' if not property.required }}: {% if property.types == ['object'] -%}{% with properties=property.properties %}
-    {% include 'typescript.object.jinja2' %}
-{%- endwith -%}{%- else -%}{{ property.types|join(' | ') }}{%- endif -%}{%- if property.is_array -%}[]{%- endif -%};
+  {{ property.name }}{{ '?' if not property.required }}:
+
+{%- if property.types == ['object'] -%}
+    {% with properties=property.properties %}
+        {% include 'typescript.object.jinja2' %}
+    {%- endwith -%}
+{%- else -%}
+    {%- if property.enum -%}
+        {{ property.enum|join(' | ') }}
+    {%- else -%}
+        {{ property.types|join(' | ') }}
+    {%- endif -%}
+{%- endif -%}
+
+    {%- if property.is_array -%}
+        []
+    {%- endif -%};
 
 {%- endfor %}
 }

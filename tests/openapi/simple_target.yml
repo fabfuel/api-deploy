@@ -425,6 +425,7 @@ components:
       - ping
       - pingAt
       - pingBy
+      - category
       properties:
         ping:
           type: string
@@ -436,6 +437,18 @@ components:
         pingAt:
           type: string
           format: date-time
+        locations:
+          type: array
+          items:
+            type: string
+        category:
+          nullable: true
+          enum:
+          - null
+          - machine
+          - human
+          - other
+          type: string
     ErrorResponse:
       type: object
       required:
