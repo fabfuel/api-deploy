@@ -13,6 +13,7 @@ class Config(Dict):
                 'request': [],
                 'response': [],
             },
+            'strict': {},
             'gateway': {},
             'cors': {},
             'static': {
@@ -36,6 +37,9 @@ class Config(Dict):
 
         default_config['generator']['output'] = config_file.get('generator', {}).get('output')
         default_config['generator']['languages'] = config_file.get('generator', {}).get('languages', [])
+
+        default_config['strict']['enabled'] = config_file.get('strict', {}).get('enabled', False)
+        default_config['strict']['blocklist'] = config_file.get('strict', {}).get('blocklist', [])
 
         super().__init__(default_config)
 
