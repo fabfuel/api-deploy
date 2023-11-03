@@ -20,3 +20,7 @@ generator:
   output: generated
   languages:
     - typescript
+strict:
+  enabled: true
+  blocklist:
+    - _links

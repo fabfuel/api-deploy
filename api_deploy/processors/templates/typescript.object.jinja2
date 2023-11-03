@@ -8,10 +8,17 @@
     */
   {{ property.name }}{{ '?' if not property.required }}:
 
-{%- if property.types == ['object'] -%}
-    {% with properties=property.properties %}
-        {% include 'typescript.object.jinja2' %}
-    {%- endwith -%}
+{%- if 'object' in property.types -%}
+    {%- if property.properties -%}
+        {% with properties=property.properties %}
+            {% include 'typescript.object.jinja2' %}
+        {%- endwith -%}
+    {% else %}
+        object
+    {%  endif %}
+    {%- if 'null' in property.types -%}
+        | null
+    {%- endif -%}
 {%- else -%}
     {%- if property.enum -%}
         {{ property.enum|join(' | ') }}

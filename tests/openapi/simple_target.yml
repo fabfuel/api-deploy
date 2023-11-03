@@ -420,12 +420,15 @@ paths:
 components:
   schemas:
     PingPayload:
+      additionalProperties: false
       type: object
       required:
       - ping
-      - pingAt
       - pingBy
+      - pingAt
+      - locations
       - category
+      - priority
       properties:
         ping:
           type: string
@@ -459,6 +462,7 @@ components:
             - 30
             - 40
     ErrorResponse:
+      additionalProperties: false
       type: object
       required:
       - code
@@ -476,6 +480,7 @@ components:
           type: string
           example: 5beb965c-7ffc-468b-a063-eb47c5b366c2
     ErrorResponseBadRequest:
+      additionalProperties: false
       type: object
       required:
       - code
@@ -493,6 +498,7 @@ components:
           type: string
           example: 5beb965c-7ffc-468b-a063-eb47c5b366c2
     ErrorResponseNotFound:
+      additionalProperties: false
       type: object
       required:
       - code

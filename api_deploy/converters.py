@@ -5,6 +5,7 @@ from requests import get
 from api_deploy.config import Config
 from api_deploy.processors.abstract_processor import AbstractProcessor
 from api_deploy.processors.code_generator import CodeGenerator
+from api_deploy.processors.strict_processor import StrictProcessor
 from api_deploy.schema import Schema, YamlDict
 
 
@@ -19,6 +20,7 @@ class ProcessManager:
         default_manager.register(StaticFileProcessor(config, **config['static']))
         default_manager.register(FlattenProcessor(config))
         default_manager.register(PassthroughProcessor(config, **config['headers']))
+        default_manager.register(StrictProcessor(config, **config['strict']))
         default_manager.register(ApiGatewayProcessor(config, **config['gateway']))
         default_manager.register(CorsProcessor(config, headers=config['headers'], **config['cors']))
         default_manager.register(CodeGenerator(config, **config['generator']))
@@ -182,7 +184,7 @@ class FlattenProcessor(AbstractProcessor):
             if self.is_ref(sub_node):
                 to_merge.append(self.lookup_ref(deepcopy(sub_node), deepcopy(schema)))
             else:
-                to_merge.append(sub_node)
+                to_merge.append(deepcopy(sub_node))
         return merge(*to_merge)
 
 

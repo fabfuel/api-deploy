@@ -57,8 +57,6 @@ components:
       type: object
       required:
         - ping
-        - pingAt
-        - pingBy
         - category
       properties:
         ping:

@@ -14,8 +14,8 @@ tags:
   description: Project management
 - name: Vendor
   description: Vendor management
-- name: Static Files
-  description: Static file content
+- description: Static file content
+  name: Static Files
 - name: CORS
   description: CORS configuration endpoints
 paths:
@@ -992,18 +992,18 @@ paths:
         '200':
           description: Static file api.v1.yml
           headers:
-            Access-Control-Allow-Origin:
-              schema:
-                type: string
-                example: 'foo.com'
-            Access-Control-Expose-Headers:
-              schema:
-                example: Content-Type
-                type: string
             Content-Type:
               schema:
                 example: text/yaml
                 type: string
+            Access-Control-Expose-Headers:
+              schema:
+                type: string
+                example: Content-Type
+            Access-Control-Allow-Origin:
+              schema:
+                type: string
+                example: foo.com
       parameters:
       - name: host
         in: header
@@ -1050,9 +1050,9 @@ paths:
           '200':
             statusCode: '200'
             responseParameters:
+              method.response.header.Content-Type: integration.response.header.Content-Type
               method.response.header.Access-Control-Allow-Origin: '''foo.com'''
               method.response.header.Access-Control-Expose-Headers: '''Content-Type'''
-              method.response.header.Content-Type: integration.response.header.Content-Type
         requestParameters:
           integration.request.header.User-Agent: context.identity.userAgent
           integration.request.header.X-Forwarded-For: context.identity.sourceIp
@@ -1075,7 +1075,7 @@ paths:
             Access-Control-Allow-Origin:
               schema:
                 type: string
-                example: 'foo.com'
+                example: foo.com
             Access-Control-Allow-Methods:
               schema:
                 type: string
@@ -1089,8 +1089,8 @@ paths:
           default:
             statusCode: '200'
             responseParameters:
-              method.response.header.Access-Control-Allow-Headers: '''authorization,host,x-datadog-origin,x-datadog-parent-id,x-datadog-sampling-priority,x-datadog-trace-id'''
               method.response.header.Access-Control-Allow-Methods: '''GET,OPTIONS'''
+              method.response.header.Access-Control-Allow-Headers: '''authorization,host,x-datadog-origin,x-datadog-parent-id,x-datadog-sampling-priority,x-datadog-trace-id'''
               method.response.header.Access-Control-Allow-Origin: '''foo.com'''
         requestTemplates:
           application/json: '{"statusCode": 200}'
@@ -1129,6 +1129,16 @@ components:
             version:
               type: string
               description: Current release version
+          required:
+          - datetime
+          - name
+          - environment
+          - uptime
+          - startup
+          - hostname
+          - version
+      required:
+      - application
     LabelList:
       type: object
       additionalProperties: false
@@ -1144,8 +1154,9 @@ components:
                 additionalProperties: false
                 required:
                 - slug
-                - label
+                - name
                 - color
+                - _links
                 properties:
                   slug:
                     type: string
@@ -1175,6 +1186,11 @@ components:
                           href:
                             type: string
                             example: https://api.server.com/v1/projects/5d4470a6-121b-40d2-aff9-00f24aa4a110
+                        required:
+                        - href
+                    additionalProperties: false
+          required:
+          - label
         _meta:
           type: object
           additionalProperties: false
@@ -1195,6 +1211,11 @@ components:
               description: Number if items skipped (for pagination)
               type: integer
               default: 0
+          required:
+          - count
+          - total
+          - limit
+          - offset
         _links:
           type: object
           readOnly: true
@@ -1206,6 +1227,13 @@ components:
                 href:
                   type: string
                   example: https://api.server.com/v1/projects/5d4470a6-121b-40d2-aff9-00f24aa4a110
+              required:
+              - href
+          additionalProperties: false
+      required:
+      - _embedded
+      - _meta
+      - _links
     OfferList:
       type: object
       additionalProperties: false
@@ -1219,13 +1247,13 @@ components:
               items:
                 type: object
                 required:
+                - offerId
+                - projectId
+                - vendorId
                 - attachments
                 - comment
-                - offerId
                 - state
                 - stateTransitions
-                - vendorId
-                - _stats
                 - _meta
                 - _links
                 - _embedded
@@ -1264,6 +1292,11 @@ components:
                         uploadedBy:
                           type: string
                           format: uuid
+                      required:
+                      - name
+                      - path
+                      - uploadedAt
+                      - uploadedBy
                   comment:
                     type: string
                     nullable: true
@@ -1311,6 +1344,13 @@ components:
                     required:
                     - createdAt
                     - createdBy
+                    - modifiedAt
+                    - modifiedBy
+                    - revisionedAt
+                    - revisionedBy
+                    - archivedAt
+                    - archivedBy
+                    - _links
                     additionalProperties: false
                     properties:
                       createdAt:
@@ -1352,6 +1392,9 @@ components:
                               href:
                                 type: string
                                 example: https://api.server.com/v1/projects/5d4470a6-121b-40d2-aff9-00f24aa4a110
+                            required:
+                            - href
+                        additionalProperties: false
                   _links:
                     type: object
                     readOnly: true
@@ -1363,6 +1406,9 @@ components:
                           href:
                             type: string
                             example: https://api.server.com/v1/projects/5d4470a6-121b-40d2-aff9-00f24aa4a110
+                        required:
+                        - href
+                    additionalProperties: false
                   _embedded:
                     type: object
                     required:
@@ -1407,6 +1453,11 @@ components:
                                   uploadedBy:
                                     type: string
                                     format: uuid
+                                required:
+                                - name
+                                - path
+                                - uploadedAt
+                                - uploadedBy
                             company:
                               type: object
                               additionalProperties: false
@@ -1459,6 +1510,17 @@ components:
                                       minLength: 1
                                       maxLength: 2
                                       example: de
+                                  required:
+                                  - streetAddress
+                                  - postalCode
+                                  - locality
+                                  - region
+                                  - country
+                              required:
+                              - name
+                              - email
+                              - phoneNumber
+                              - deliveryAddress
                             description:
                               type: string
                               example: This is an example project
@@ -1513,6 +1575,13 @@ components:
                               required:
                               - createdAt
                               - createdBy
+                              - modifiedAt
+                              - modifiedBy
+                              - revisionedAt
+                              - revisionedBy
+                              - archivedAt
+                              - archivedBy
+                              - _links
                               additionalProperties: false
                               properties:
                                 createdAt:
@@ -1554,6 +1623,9 @@ components:
                                         href:
                                           type: string
                                           example: https://api.server.com/v1/projects/5d4470a6-121b-40d2-aff9-00f24aa4a110
+                                      required:
+                                      - href
+                                  additionalProperties: false
                             _links:
                               type: object
                               readOnly: true
@@ -1565,6 +1637,22 @@ components:
                                     href:
                                       type: string
                                       example: https://api.server.com/v1/projects/5d4470a6-121b-40d2-aff9-00f24aa4a110
+                                  required:
+                                  - href
+                              additionalProperties: false
+                          required:
+                          - projectId
+                          - customerId
+                          - attachments
+                          - company
+                          - description
+                          - title
+                          - state
+                          - stateTransitions
+                          - _meta
+                          - _links
+          required:
+          - offer
         _meta:
           type: object
           additionalProperties: false
@@ -1585,6 +1673,11 @@ components:
               description: Number if items skipped (for pagination)
               type: integer
               default: 0
+          required:
+          - count
+          - total
+          - limit
+          - offset
         _links:
           type: object
           readOnly: true
@@ -1596,16 +1689,23 @@ components:
                 href:
                   type: string
                   example: https://api.server.com/v1/projects/5d4470a6-121b-40d2-aff9-00f24aa4a110
+              required:
+              - href
+          additionalProperties: false
+      required:
+      - _embedded
+      - _meta
+      - _links
     Offer:
       type: object
       required:
+      - offerId
+      - projectId
+      - vendorId
       - attachments
       - comment
-      - offerId
       - state
       - stateTransitions
-      - vendorId
-      - _stats
       - _meta
       - _links
       - _embedded
@@ -1644,6 +1744,11 @@ components:
               uploadedBy:
                 type: string
                 format: uuid
+            required:
+            - name
+            - path
+            - uploadedAt
+            - uploadedBy
         comment:
           type: string
           nullable: true
@@ -1691,6 +1796,13 @@ components:
           required:
           - createdAt
           - createdBy
+          - modifiedAt
+          - modifiedBy
+          - revisionedAt
+          - revisionedBy
+          - archivedAt
+          - archivedBy
+          - _links
           additionalProperties: false
           properties:
             createdAt:
@@ -1732,6 +1844,9 @@ components:
                     href:
                       type: string
                       example: https://api.server.com/v1/projects/5d4470a6-121b-40d2-aff9-00f24aa4a110
+                  required:
+                  - href
+              additionalProperties: false
         _links:
           type: object
           readOnly: true
@@ -1743,6 +1858,9 @@ components:
                 href:
                   type: string
                   example: https://api.server.com/v1/projects/5d4470a6-121b-40d2-aff9-00f24aa4a110
+              required:
+              - href
+          additionalProperties: false
         _embedded:
           type: object
           required:
@@ -1786,6 +1904,11 @@ components:
                         uploadedBy:
                           type: string
                           format: uuid
+                      required:
+                      - name
+                      - path
+                      - uploadedAt
+                      - uploadedBy
                   company:
                     type: object
                     additionalProperties: false
@@ -1835,6 +1958,17 @@ components:
                             minLength: 1
                             maxLength: 2
                             example: de
+                        required:
+                        - streetAddress
+                        - postalCode
+                        - locality
+                        - region
+                        - country
+                    required:
+                    - name
+                    - email
+                    - phoneNumber
+                    - deliveryAddress
                   description:
                     type: string
                     example: This is an example project
@@ -1888,6 +2022,13 @@ components:
                     required:
                     - createdAt
                     - createdBy
+                    - modifiedAt
+                    - modifiedBy
+                    - revisionedAt
+                    - revisionedBy
+                    - archivedAt
+                    - archivedBy
+                    - _links
                     additionalProperties: false
                     properties:
                       createdAt:
@@ -1929,6 +2070,9 @@ components:
                               href:
                                 type: string
                                 example: https://api.server.com/v1/projects/5d4470a6-121b-40d2-aff9-00f24aa4a110
+                            required:
+                            - href
+                        additionalProperties: false
                   _links:
                     type: object
                     readOnly: true
@@ -1940,6 +2084,20 @@ components:
                           href:
                             type: string
                             example: https://api.server.com/v1/projects/5d4470a6-121b-40d2-aff9-00f24aa4a110
+                        required:
+                        - href
+                    additionalProperties: false
+                required:
+                - projectId
+                - customerId
+                - attachments
+                - company
+                - description
+                - title
+                - state
+                - stateTransitions
+                - _meta
+                - _links
   securitySchemes:
     authorizer-foobar:
       type: apiKey
