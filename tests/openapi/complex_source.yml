@@ -563,9 +563,12 @@ components:
 
   securitySchemes:
     authorizer-foobar:
-      type: "apiKey"
-      name: "Authorization"
-      in: "header"
+      type: oauth2
+      flows:
+        implicit:
+          authorizationUrl: https://packmatic-testing.eu.auth0.com/oauth2/authorize?audience=https://api-staging.packmatic.io
+          scopes:
+            read:users: read users
       x-amazon-apigateway-authtype: "custom"
       x-amazon-apigateway-authorizer:
         type: "token"

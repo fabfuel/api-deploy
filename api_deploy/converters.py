@@ -208,6 +208,15 @@ class ApiGatewayProcessor(AbstractProcessor):
                     'responses': self._get_response_codes(schema, path, method),
                     'requestParameters': self._get_request_parameters(schema, path, method),
                 }
+
+        # Replace all authorizers with API key type
+        for authorizer in schema['components'].get('securitySchemes', {}):
+            schema['components']['securitySchemes'][authorizer]['type'] = 'apiKey'
+            schema['components']['securitySchemes'][authorizer]['in'] = 'header'
+            schema['components']['securitySchemes'][authorizer]['name'] = 'Authorization'
+            schema['components']['securitySchemes'][authorizer]['flows'] = None
+            del schema['components']['securitySchemes'][authorizer]['flows']
+
         return schema
 
     def _get_response_codes(self, schema, path, method):
