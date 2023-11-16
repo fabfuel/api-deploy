@@ -209,6 +209,12 @@ class ApiGatewayProcessor(AbstractProcessor):
                     'requestParameters': self._get_request_parameters(schema, path, method),
                 }
 
+                # Remove all scopes from endpoints
+                for security in endpoint.get('security', {}):
+                    for authorizer in security:
+                        # remove all scopes from authorizer, not supported in API Gateway
+                        security[authorizer] = []
+
         # Replace all authorizers with API key type
         for authorizer in schema['components'].get('securitySchemes', {}):
             schema['components']['securitySchemes'][authorizer]['type'] = 'apiKey'
