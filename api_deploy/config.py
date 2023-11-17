@@ -30,6 +30,7 @@ class Config(Dict):
         default_config['gateway'].setdefault('integration_host',
                                              config_file.get('gateway', {}).get('integrationHost', ''))
         default_config['gateway'].setdefault('connection_id', config_file.get('gateway', {}).get('connectionId', ''))
+        default_config['gateway'].setdefault('remove_scopes', config_file.get('gateway', {}).get('removeScopes', False))
 
         default_config['cors'].setdefault('allow_origin', config_file.get('cors', {}).get('origin', '*'))
 
