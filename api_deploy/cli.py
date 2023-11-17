@@ -58,6 +58,10 @@ def deploy(config_file,
         target_schema = source_schema
     else:
         click.secho(f'Compiling OpenAPI file: "{source_file}"')
+
+        # Always remove scopes when deploying to Amazon API Gateway
+        config['gateway']['remove_scopes'] = True
+
         target_schema = _compile(source_schema, config)
         click.secho('Successfully compiled OpenAPI file.\n', fg='green')
 

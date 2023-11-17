@@ -189,10 +189,11 @@ class FlattenProcessor(AbstractProcessor):
 
 
 class ApiGatewayProcessor(AbstractProcessor):
-    def __init__(self, config: Config, integration_host, connection_id, **kwargs) -> None:
+    def __init__(self, config: Config, integration_host, connection_id, remove_scopes, **kwargs) -> None:
         super().__init__(config)
         self.integration_host = integration_host
         self.connection_id = connection_id
+        self.remove_scopes = remove_scopes
 
     def process(self, schema: Schema) -> Schema:
         for path in schema['paths']:
@@ -210,10 +211,11 @@ class ApiGatewayProcessor(AbstractProcessor):
                 }
 
                 # Remove all scopes from endpoints
-                for security in endpoint.get('security', {}):
-                    for authorizer in security:
-                        # remove all scopes from authorizer, not supported in API Gateway
-                        security[authorizer] = []
+                if self.remove_scopes:
+                    for security in endpoint.get('security', {}):
+                        for authorizer in security:
+                            # remove all scopes from authorizer, not supported in API Gateway
+                            security[authorizer] = []
 
         # Replace all authorizers with API key type
         for authorizer in schema['components'].get('securitySchemes', {}):

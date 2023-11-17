@@ -1,6 +1,7 @@
 gateway:
   integrationHost: https://integration.com
   connectionId: 1234567890
+  removeScopes: true
 headers:
   request:
     - host
