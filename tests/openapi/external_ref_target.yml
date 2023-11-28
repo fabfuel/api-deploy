@@ -16,7 +16,7 @@ paths:
       tags:
       - Health
       security:
-      - firebase: []
+      - auth0: []
       responses:
         '200':
           description: Health JSON response
@@ -30,16 +30,23 @@ paths:
                     type: object
                     additionalProperties: false
                     properties:
-                      datetime:
-                        type: string
-                        format: date-time
-                        description: Current date and time of the server
                       name:
                         type: string
                         description: Name of the application
                       environment:
                         type: string
                         description: Name of the environment the app is running in
+                      version:
+                        type: string
+                        description: Current release version
+                  instance:
+                    type: object
+                    additionalProperties: false
+                    properties:
+                      datetime:
+                        type: string
+                        format: date-time
+                        description: Current date and time of the server
                       uptime:
                         type: string
                         description: Duration of how long the app is running
@@ -50,9 +57,6 @@ paths:
                       hostname:
                         type: string
                         description: Hostname of the application host or container
-                      version:
-                        type: string
-                        description: Current release version
           headers:
             Access-Control-Allow-Origin:
               schema:
@@ -78,6 +82,35 @@ paths:
                   error:
                     type: string
                     example: Unauthorized
+                  incident:
+                    description: Unique incident identifier
+                    type: string
+                    example: 5beb965c-7ffc-468b-a063-eb47c5b366c2
+          headers:
+            Access-Control-Allow-Origin:
+              schema:
+                type: string
+                example: foo.com
+        '403':
+          description: Forbidden
+          content:
+            application/json:
+              schema:
+                type: object
+                required:
+                - statusCode
+                - message
+                additionalProperties: false
+                properties:
+                  statusCode:
+                    type: integer
+                    example: 403
+                  message:
+                    type: string
+                    example: Forbidden resource
+                  error:
+                    type: string
+                    example: Forbidden
                   incident:
                     description: Unique incident identifier
                     type: string
@@ -165,6 +198,10 @@ paths:
               method.response.header.Access-Control-Allow-Origin: '''foo.com'''
           '401':
             statusCode: '401'
+            responseParameters:
+              method.response.header.Access-Control-Allow-Origin: '''foo.com'''
+          '403':
+            statusCode: '403'
             responseParameters:
               method.response.header.Access-Control-Allow-Origin: '''foo.com'''
         requestParameters:
