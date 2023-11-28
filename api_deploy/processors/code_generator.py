@@ -26,10 +26,13 @@ class CodeGenerator(AbstractProcessor):
                         if not schema['paths'][path][method]['responses'][response_code].get('content'):
                             continue
 
-                        response_model_ref = schema['paths'][path][method]['responses'][response_code]['content']['application/json']['schema'].get('$ref')
+                        if schema['paths'][path][method]['responses'][response_code]['content'].get('application/json'):
+                            response_model_ref = schema['paths'][path][method]['responses'][response_code]['content']['application/json']['schema'].get('$ref')
 
-                        if response_model_ref:
-                            self.dump_model(language, schema, response_model_ref, operation_id, response_code)
+                            if response_model_ref:
+                                self.dump_model(language, schema, response_model_ref, operation_id, response_code)
+                        else:
+                            print(f'Warning, response {method.upper()} {path}@{response_code} has no response schema defined for content-type application/json')
 
                     request_body = schema['paths'][path][method].get('requestBody')
                     if request_body:
@@ -80,6 +83,7 @@ class CodeGenerator(AbstractProcessor):
         properties = []
         for property in schema.get('properties', []):
             property_schema = schema['properties'][property]
+            property_type = property_schema.get('type', 'string')
 
             if writeOnly and property_schema.get('readOnly') is True:
                 continue
@@ -89,22 +93,22 @@ class CodeGenerator(AbstractProcessor):
                 for enum in property_schema['enum']:
                     if enum is None:
                         processed_enum.append(f"null")
-                    elif property_schema['type'] == 'string':
+                    elif property_type == 'string':
                         processed_enum.append(f"'{enum}'")
                     else:
                         processed_enum.append(enum)
 
-            if property_schema['type'] == 'integer':
+            if property_type == 'integer':
                 types = ['number']
                 sub_properties = []
-            elif property_schema['type'] == 'array':
+            elif property_type == 'array':
                 types = [property_schema['items']['type']]
                 sub_properties = self.get_properties(property_schema['items'], writeOnly)
-            elif property_schema['type'] == 'object':
+            elif property_type == 'object':
                 types = ['object']
                 sub_properties = self.get_properties(property_schema, writeOnly)
             else:
-                types = [property_schema['type']]
+                types = [property_type]
                 sub_properties = []
 
             if property_schema.get('nullable') is True:
@@ -116,7 +120,7 @@ class CodeGenerator(AbstractProcessor):
                 'required': property in schema.get('required', []),
                 'description': property_schema.get('description', ''),
                 'example': property_schema.get('example', ''),
-                'is_array': property_schema['type'] == 'array',
+                'is_array': property_type == 'array',
                 'properties': sub_properties,
                 'enum': processed_enum,
             })
