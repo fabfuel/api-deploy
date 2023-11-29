@@ -13,9 +13,9 @@
         {% with properties=property.properties %}
             {% include 'typescript.object.jinja2' %}
         {%- endwith -%}
-    {% else %}
+    {%- else -%}
         object
-    {%  endif %}
+    {%-  endif %}
     {%- if 'null' in property.types -%}
         | null
     {%- endif -%}
