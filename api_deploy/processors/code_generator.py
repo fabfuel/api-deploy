@@ -103,6 +103,8 @@ class CodeGenerator(AbstractProcessor):
                 sub_properties = []
             elif property_type == 'array':
                 types = [property_schema['items']['type']]
+                if types == ['integer']:
+                    types = ['number']
                 sub_properties = self.get_properties(property_schema['items'], writeOnly)
             elif property_type == 'object':
                 types = ['object']
