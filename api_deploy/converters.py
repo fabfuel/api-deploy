@@ -53,7 +53,8 @@ class FlattenProcessor(AbstractProcessor):
         # Enforce replacement of all $refs from parameters
         self.replace_refs_dict(target['components'].get('parameters', {}), target, True, True)
 
-        # Replace $refs in all components – run twice to catch all nesting
+        # Replace $refs in all components – run thrice to catch all nesting
+        self.replace_refs_dict(target['components'], target)
         self.replace_refs_dict(target['components'], target)
         self.replace_refs_dict(target['components'], target)
 
