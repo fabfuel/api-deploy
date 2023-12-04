@@ -3,4 +3,3 @@ __pycache__
 api_deploy.egg-info
 /.idea
 /dist
-/tests/functional/generated
