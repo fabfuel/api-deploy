@@ -18,7 +18,23 @@ paths:
     $ref: 'https://api-staging.packmatic.io/types/endpoints/health.yml'
   /-/ping:
     $ref: 'https://api-staging.packmatic.io/types/endpoints/ping.yml'
+  /test:
+    get:
+      tags:
+        - Test
+      summary: "Test"
+      operationId: "test"
+      responses:
+        '200':
+          description: "Test"
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Test'
 
 components:
-  schemas: {}
-  parameters: {}
+  schemas:
+    Test:
+      $ref: 'https://api-staging.packmatic.io/types/schemas/metadata-item.yml'
+
+  parameters: { }
