@@ -642,7 +642,7 @@ components:
           readOnly: true
         packmaticId:
           type: string
-          pattern: ^[A-Z]{2}-[A-Z0-9]{5,6}+$
+          pattern: ^[A-Z]{2}-[A-Z0-9]{5,6}$
           description: Human friendly entity reference code, consisting of a type
             indicating prefix and a unique identifier, consisting of uppercase letters
             and digits.
