@@ -1,6 +1,6 @@
 from copy import deepcopy
 from mergedeep import merge
-from requests import get
+from requests import get, HTTPError
 
 from api_deploy.config import Config
 from api_deploy.processors.abstract_processor import AbstractProcessor
@@ -108,6 +108,11 @@ class FlattenProcessor(AbstractProcessor):
     def get_external_schema(self, url):
         if not self.external_schemas.get(url):
             response = get(url)
+            try:
+                response.raise_for_status()
+            except HTTPError:
+                raise HTTPError(f'Could not fetch external schema: {url}')
+
             self.external_schemas[url] = YamlDict(response.text)
 
         return self.external_schemas[url]
