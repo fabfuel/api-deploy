@@ -18,10 +18,16 @@ def api():  # pragma: no cover
 @click.argument('source_file', type=click.Path(exists=True))
 @click.argument('target_file', type=click.Path(exists=False))
 def compile_file(config_file, source_file, target_file):
-    config = Config.from_file(config_file)
-    source_schema = Schema.from_file(source_file)
-    target_schema = _compile(source_schema, config)
-    target_schema.to_file(target_file)
+    try:
+        config = Config.from_file(config_file)
+        source_schema = Schema.from_file(source_file)
+        target_schema = _compile(source_schema, config)
+        target_schema.to_file(target_file)
+        click.secho(f'Successfully compiled OpenAPI file: {target_file}', fg='green')
+
+    except Exception as e:
+        click.secho('Failed to compile OpenAPI file.', fg='red')
+        click.secho(str(e), fg='red')
 
 
 @click.command()
