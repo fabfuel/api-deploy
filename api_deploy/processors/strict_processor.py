@@ -69,9 +69,9 @@ class StrictProcessor(AbstractProcessor):
                 add_required_deep = True
 
             if model['properties'][property].get('type') == 'array':
-                model['properties'][property]['items'] = self.enable_strictness(model['properties'][property]['items'], add_required_deep)
+                model['properties'][property]['items'] = self.enable_strictness(model['properties'][property]['items'], add_required_deep, remove_required)
 
-            model['properties'][property] = self.enable_strictness(model['properties'][property], add_required_deep)
+            model['properties'][property] = self.enable_strictness(model['properties'][property], add_required_deep, remove_required)
 
         if not model.get('additionalProperties'):
             model['additionalProperties'] = False
