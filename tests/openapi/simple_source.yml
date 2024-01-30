@@ -50,6 +50,27 @@ paths:
         "500":
           $ref: "#/components/responses/ServerError"
       x-amazon-apigateway-request-validator: "all"
+    patch:
+      operationId: pingPatch
+      description: Patch a custom Ping request
+      tags:
+        - Health
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: "#/components/schemas/PingPayload"
+      responses:
+        "200":
+          $ref: "#/components/responses/Ping"
+        "400":
+          $ref: "#/components/responses/BadRequest"
+        "404":
+          $ref: "#/components/responses/NotFound"
+        "500":
+          $ref: "#/components/responses/ServerError"
+      x-amazon-apigateway-request-validator: "all"
 
 components:
   schemas:

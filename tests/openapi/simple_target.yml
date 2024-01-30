@@ -272,6 +272,137 @@ paths:
           integration.request.header.x-datadog-parent-id: method.request.header.x-datadog-parent-id
           integration.request.header.x-datadog-origin: method.request.header.x-datadog-origin
           integration.request.header.x-datadog-sampling-priority: method.request.header.x-datadog-sampling-priority
+    patch:
+      operationId: pingPatch
+      description: Patch a custom Ping request
+      tags:
+      - Health
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/PingPayloadPatch'
+      responses:
+        '200':
+          description: Ping
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/PingPayload'
+          headers:
+            x-ping:
+              schema:
+                type: string
+            Access-Control-Expose-Headers:
+              schema:
+                type: string
+                example: x-ping
+            Access-Control-Allow-Origin:
+              schema:
+                type: string
+                example: foo.com
+        '400':
+          description: Bad Request
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ErrorResponseBadRequest'
+          headers:
+            Access-Control-Allow-Origin:
+              schema:
+                type: string
+                example: foo.com
+        '404':
+          description: Not Found
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ErrorResponseNotFound'
+          headers:
+            Access-Control-Allow-Origin:
+              schema:
+                type: string
+                example: foo.com
+        '500':
+          description: Internal Server Error
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ErrorResponse'
+          headers:
+            Access-Control-Allow-Origin:
+              schema:
+                type: string
+                example: foo.com
+      x-amazon-apigateway-request-validator: all
+      parameters:
+      - name: host
+        in: header
+        required: false
+        schema:
+          type: string
+      - name: authorization
+        in: header
+        required: false
+        schema:
+          type: string
+      - name: x-datadog-trace-id
+        in: header
+        required: false
+        schema:
+          type: string
+      - name: x-datadog-parent-id
+        in: header
+        required: false
+        schema:
+          type: string
+      - name: x-datadog-origin
+        in: header
+        required: false
+        schema:
+          type: string
+      - name: x-datadog-sampling-priority
+        in: header
+        required: false
+        schema:
+          type: string
+      x-amazon-apigateway-integration:
+        type: http
+        connectionId: 1234567890
+        httpMethod: PATCH
+        uri: https://integration.com/-/ping
+        passthroughBehavior: when_no_match
+        connectionType: VPC_LINK
+        responses:
+          default:
+            statusCode: '500'
+            responseParameters:
+              method.response.header.Access-Control-Allow-Origin: '''foo.com'''
+          '200':
+            statusCode: '200'
+            responseParameters:
+              method.response.header.x-ping: integration.response.header.x-ping
+              method.response.header.Access-Control-Allow-Origin: '''foo.com'''
+              method.response.header.Access-Control-Expose-Headers: '''x-ping'''
+          '400':
+            statusCode: '400'
+            responseParameters:
+              method.response.header.Access-Control-Allow-Origin: '''foo.com'''
+          '404':
+            statusCode: '404'
+            responseParameters:
+              method.response.header.Access-Control-Allow-Origin: '''foo.com'''
+        requestParameters:
+          integration.request.header.User-Agent: context.identity.userAgent
+          integration.request.header.X-Forwarded-For: context.identity.sourceIp
+          integration.request.header.X-Stage: context.stage
+          integration.request.header.host: method.request.header.host
+          integration.request.header.authorization: method.request.header.authorization
+          integration.request.header.x-datadog-trace-id: method.request.header.x-datadog-trace-id
+          integration.request.header.x-datadog-parent-id: method.request.header.x-datadog-parent-id
+          integration.request.header.x-datadog-origin: method.request.header.x-datadog-origin
+          integration.request.header.x-datadog-sampling-priority: method.request.header.x-datadog-sampling-priority
     options:
       operationId: /-/pingCORS
       description: /-/ping CORS
@@ -288,7 +419,7 @@ paths:
             Access-Control-Allow-Methods:
               schema:
                 type: string
-                example: GET,POST,OPTIONS
+                example: GET,POST,PATCH,OPTIONS
             Access-Control-Allow-Headers:
               schema:
                 type: string
@@ -298,7 +429,7 @@ paths:
           default:
             statusCode: '200'
             responseParameters:
-              method.response.header.Access-Control-Allow-Methods: '''GET,POST,OPTIONS'''
+              method.response.header.Access-Control-Allow-Methods: '''GET,POST,PATCH,OPTIONS'''
               method.response.header.Access-Control-Allow-Headers: '''authorization,host,x-datadog-origin,x-datadog-parent-id,x-datadog-sampling-priority,x-datadog-trace-id'''
               method.response.header.Access-Control-Allow-Origin: '''foo.com'''
         requestTemplates:
@@ -456,11 +587,46 @@ components:
           type: integer
           default: 0
           enum:
-            - 0
-            - 10
-            - 20
-            - 30
-            - 40
+          - 0
+          - 10
+          - 20
+          - 30
+          - 40
+    PingPayloadPatch:
+      additionalProperties: false
+      type: object
+      properties:
+        ping:
+          type: string
+          example: pong
+        pingBy:
+          type: string
+          description: Unique user identifier
+          example: user@server.com
+        pingAt:
+          type: string
+          format: date-time
+        locations:
+          type: array
+          items:
+            type: string
+        category:
+          nullable: true
+          enum:
+          - null
+          - machine
+          - human
+          - other
+          type: string
+        priority:
+          type: integer
+          default: 0
+          enum:
+          - 0
+          - 10
+          - 20
+          - 30
+          - 40
     ErrorResponse:
       additionalProperties: false
       type: object
