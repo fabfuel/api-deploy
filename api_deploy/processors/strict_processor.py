@@ -1,6 +1,7 @@
 from api_deploy.config import Config
 from api_deploy.processors.abstract_processor import AbstractProcessor
 from api_deploy.schema import Schema
+from copy import deepcopy
 
 
 class StrictProcessor(AbstractProcessor):
@@ -13,15 +14,47 @@ class StrictProcessor(AbstractProcessor):
         if not self.enabled:
             return schema
 
+        schemas_to_patch = []
+        for path in schema['paths']:
+            for method in schema['paths'][path]:
+                if method.lower() != 'patch':
+                    continue
+                endpoint = schema['paths'][path][method]
+                schema_name = endpoint['requestBody']['content']['application/json']['schema']['$ref'].split('/')[-1]
+                schemas_to_patch.append(schema_name)
+
         schemas = schema['components']['schemas']
+        patch_models = {}
 
         for name in schemas:
             model = schemas[name]
+
+            if name in schemas_to_patch:
+                model_patch_name = name + 'Patch'
+                model_patch = deepcopy(schemas[name])
+                patch_models[model_patch_name] = model_patch
+                self.enable_strictness(model_patch, False, True)
+
             self.enable_strictness(model, True)
+
+        schemas.update(patch_models)
+
+        # Use patch models instead of original models for PATCH endpoints
+        for path in schema['paths']:
+            for method in schema['paths'][path]:
+                if method.lower() != 'patch':
+                    continue
+
+                # Ensure PATCH endpoint is an independent copy of the original endpoint
+                schema['paths'][path][method] = deepcopy(schema['paths'][path][method])
+
+                endpoint = schema['paths'][path][method]
+                endpoint_schema = endpoint['requestBody']['content']['application/json']['schema']
+                endpoint_schema['$ref'] = endpoint_schema['$ref'] + 'Patch'
 
         return schema
 
-    def enable_strictness(self, model, add_required):
+    def enable_strictness(self, model, add_required, remove_required=False):
         if model.get('type') != 'object':
             return model
 
@@ -45,5 +78,8 @@ class StrictProcessor(AbstractProcessor):
 
         if add_required and required:
             model['required'] = required
+
+        if remove_required:
+            model.pop('required', None)
 
         return model
