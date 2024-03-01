@@ -90,10 +90,17 @@ class CodeGenerator(AbstractProcessor):
 
             processed_enum = []
             if property_schema.get('enum'):
-                for enum in property_schema['enum']:
+                raw_enum = property_schema['enum']
+            elif property_schema.get('items', {}).get('enum'):
+                raw_enum = property_schema['items']['enum']
+            else:
+                raw_enum = []
+
+            if raw_enum:
+                for enum in raw_enum:
                     if enum is None:
                         processed_enum.append(f"null")
-                    elif property_type == 'string':
+                    elif isinstance(enum, str):
                         processed_enum.append(f"'{enum}'")
                     else:
                         processed_enum.append(enum)

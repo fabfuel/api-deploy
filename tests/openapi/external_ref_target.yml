@@ -626,8 +626,8 @@ components:
       properties:
         id:
           type: string
-          format: uuid
-          description: Unique entity identifier in UUID format
+          example: 5d4470a6-121b-40d2-aff9-00f24aa4a110
+          description: Unique identifier, optionally in UUID format
           readOnly: true
         urn:
           type: string
