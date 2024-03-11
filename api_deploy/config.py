@@ -40,6 +40,7 @@ class Config(Dict):
         default_config['generator']['languages'] = config_file.get('generator', {}).get('languages', [])
 
         default_config['strict']['enabled'] = config_file.get('strict', {}).get('enabled', False)
+        default_config['strict']['overwrite_required'] = config_file.get('strict', {}).get('overwriteRequired', True)
         default_config['strict']['blocklist'] = config_file.get('strict', {}).get('blocklist', [])
 
         super().__init__(default_config)

@@ -554,13 +554,8 @@ components:
       additionalProperties: false
       type: object
       required:
-      - directions
       - ping
-      - pingBy
-      - pingAt
-      - locations
       - category
-      - priority
       properties:
         ping:
           type: string

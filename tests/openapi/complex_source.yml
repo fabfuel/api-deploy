@@ -169,9 +169,6 @@ components:
     MetadataItem:
       type: object
       readOnly: true
-      required:
-        - createdAt
-        - createdBy
       additionalProperties: false
       properties:
         createdAt:
@@ -324,7 +321,7 @@ components:
       additionalProperties: false
       required:
         - slug
-        - label
+        - name
         - color
       properties:
         slug:
@@ -382,17 +379,6 @@ components:
 
     Offer:
       type: object
-      required:
-        - attachments
-        - comment
-        - offerId
-        - state
-        - stateTransitions
-        - vendorId
-        - _stats
-        - _meta
-        - _links
-        - _embedded
       additionalProperties: false
       properties:
         offerId:

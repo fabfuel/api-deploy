@@ -6,8 +6,9 @@ from copy import deepcopy
 
 class StrictProcessor(AbstractProcessor):
 
-    def __init__(self, config: Config, enabled: bool, blocklist: list, **kwargs) -> None:
+    def __init__(self, config: Config, enabled: bool, blocklist: list, overwrite_required: bool, **kwargs) -> None:
         self.enabled = enabled
+        self.overwrite_required = overwrite_required
         self.blocklist = blocklist
 
     def process(self, schema: Schema) -> Schema:
@@ -57,6 +58,9 @@ class StrictProcessor(AbstractProcessor):
     def enable_strictness(self, model, add_required, remove_required=False):
         if model.get('type') != 'object':
             return model
+
+        if model.get('required') and not self.overwrite_required:
+            add_required = False
 
         required = []
 
