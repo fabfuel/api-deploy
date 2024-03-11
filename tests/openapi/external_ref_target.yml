@@ -617,7 +617,6 @@ components:
       - id
       - urn
       - tenant
-      - packmaticId
       - createdAt
       - createdBy
       - modifiedAt

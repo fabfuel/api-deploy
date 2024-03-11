@@ -23,5 +23,6 @@ generator:
     - typescript
 strict:
   enabled: true
+  overwriteRequired: false
   blocklist:
     - _links

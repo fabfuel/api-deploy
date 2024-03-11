@@ -1156,7 +1156,6 @@ components:
                 - slug
                 - name
                 - color
-                - _links
                 properties:
                   slug:
                     type: string
