@@ -59,7 +59,7 @@ class StrictProcessor(AbstractProcessor):
         if model.get('type') != 'object':
             return model
 
-        if model.get('required') and not self.overwrite_required:
+        if 'required' in model and not self.overwrite_required:
             add_required = False
 
         required = []
@@ -82,6 +82,9 @@ class StrictProcessor(AbstractProcessor):
 
         if add_required and required:
             model['required'] = required
+
+        if len(model['required']) == 0:
+            remove_required = True
 
         if remove_required:
             model.pop('required', None)
