@@ -120,6 +120,12 @@ components:
             - 20
             - 30
             - 40
+        _embedded:
+          type: object
+          required: []
+          properties:
+            preference:
+              type: string
 
     Timestamp:
       type: string

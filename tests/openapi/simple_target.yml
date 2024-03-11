@@ -597,6 +597,12 @@ components:
           - 20
           - 30
           - 40
+        _embedded:
+          additionalProperties: false
+          type: object
+          properties:
+            preference:
+              type: string
     PingPayloadPatch:
       additionalProperties: false
       type: object
@@ -641,6 +647,12 @@ components:
           - 20
           - 30
           - 40
+        _embedded:
+          additionalProperties: false
+          type: object
+          properties:
+            preference:
+              type: string
     ErrorResponse:
       additionalProperties: false
       type: object
