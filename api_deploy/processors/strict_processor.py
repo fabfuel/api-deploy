@@ -83,7 +83,7 @@ class StrictProcessor(AbstractProcessor):
         if add_required and required:
             model['required'] = required
 
-        if len(model['required']) == 0:
+        if len(model.get('required', [])) == 0:
             remove_required = True
 
         if remove_required:
