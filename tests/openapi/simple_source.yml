@@ -74,12 +74,24 @@ paths:
 
 components:
   schemas:
+    PingDirection:
+      type: string
+      enum:
+        - north
+        - east
+        - south
+        - west
+
     PingPayload:
       type: object
       required:
         - ping
         - category
       properties:
+        directions:
+          type: array
+          items:
+            $ref: '#/components/schemas/PingDirection'
         ping:
           type: string
           example: pong

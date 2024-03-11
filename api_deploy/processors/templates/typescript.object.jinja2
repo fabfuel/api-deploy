@@ -21,7 +21,7 @@
     {%- endif -%}
 {%- else -%}
     {%- if property.enum -%}
-        {{ property.enum|join(' | ') }}
+        ({{ property.enum|join(' | ') }})
     {%- else -%}
         {{ property.types|join(' | ') }}
     {%- endif -%}
