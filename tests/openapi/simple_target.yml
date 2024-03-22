@@ -600,8 +600,27 @@ components:
         _embedded:
           additionalProperties: false
           type: object
+          required:
+            - mandatory
           properties:
             preference:
+              type: string
+            mandatory:
+              type: string
+        _not_required:
+          additionalProperties: false
+          type: object
+          properties:
+            optionalA:
+              type: string
+            optionalB:
+              type: string
+        _not_strict:
+          type: object
+          properties:
+            optionalA:
+              type: string
+            optionalB:
               type: string
     PingPayloadPatch:
       additionalProperties: false
@@ -652,6 +671,23 @@ components:
           type: object
           properties:
             preference:
+              type: string
+            mandatory:
+              type: string
+        _not_required:
+          additionalProperties: false
+          type: object
+          properties:
+            optionalA:
+              type: string
+            optionalB:
+              type: string
+        _not_strict:
+          type: object
+          properties:
+            optionalA:
+              type: string
+            optionalB:
               type: string
     ErrorResponse:
       additionalProperties: false

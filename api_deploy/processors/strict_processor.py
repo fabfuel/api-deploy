@@ -59,6 +59,14 @@ class StrictProcessor(AbstractProcessor):
         if model.get('type') != 'object':
             return model
 
+        if model.get('x-not-strict'):
+            del model['x-not-strict']
+            return model
+
+        if model.get('x-not-required'):
+            add_required = False
+            del model['x-not-required']
+
         if 'required' in model and not self.overwrite_required:
             add_required = False
 
