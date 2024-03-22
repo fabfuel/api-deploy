@@ -122,9 +122,28 @@ components:
             - 40
         _embedded:
           type: object
-          required: []
+          required:
+            - mandatory
           properties:
             preference:
+              type: string
+            mandatory:
+              type: string
+        _not_required:
+          x-not-required: true
+          type: object
+          properties:
+            optionalA:
+              type: string
+            optionalB:
+              type: string
+        _not_strict:
+          x-not-strict: true
+          type: object
+          properties:
+            optionalA:
+              type: string
+            optionalB:
               type: string
 
     Timestamp:
