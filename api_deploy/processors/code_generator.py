@@ -36,18 +36,19 @@ class CodeGenerator(AbstractProcessor):
 
                     request_body = schema['paths'][path][method].get('requestBody')
                     if request_body:
-                        request_model_ref = request_body['content']['application/json']['schema']['$ref']
+                        request_model_ref = request_body['content']['application/json']['schema'].get('$ref')
                         if request_model_ref:
                             self.dump_model(language, schema, request_model_ref, operation_id)
+                        else:
+                            self.dump_model(language, schema, None, operation_id, None, request_body['content']['application/json']['schema'])
+
 
         return schema
 
-    def dump_model(self, language, schema, model_ref, operation_id, response_code=None):
-        components, component_type, model = model_ref.split('/')[1:]
-        model_schema = schema[components][component_type].get(model)
-
-        if model_schema['type'] != 'object':
-            return
+    def dump_model(self, language, schema, model_ref, operation_id, response_code=None, model_schema=None):
+        if not model_schema:
+            components, component_type, model_name = model_ref.split('/')[1:]
+            model_schema = schema[components][component_type].get(model_name)
 
         absolute_path = os.path.dirname(__file__)
         template_path = os.path.join(absolute_path, "templates")
@@ -63,10 +64,32 @@ class CodeGenerator(AbstractProcessor):
         environment = jinja2.Environment(loader=jinja2.FileSystemLoader(template_path))
         template = environment.get_template(f"{language}.jinja2")
 
+        if 'oneOf' in model_schema:
+            models = []
+            for one_of_model in model_schema['oneOf']:
+                if '$ref' in one_of_model:
+                    components, component_type, model_name = one_of_model['$ref'].split('/')[1:]
+                    one_of_model_schema = schema[components][component_type].get(model_name)
+                    properties = self.get_properties(one_of_model_schema, response_code is None)
+                else:
+                    properties = self.get_properties(one_of_model, response_code is None)
+
+                models.append({
+                    'properties': properties,
+                    'discriminator_name': model_schema.get('discriminator', {}).get('propertyName') or None,
+                    'discriminator_value': model_name,
+                })
+        else:
+            models = [{
+                'properties': self.get_properties(model_schema, response_code is None),
+                'discriminator_name': None,
+                'discriminator_value': None,
+            }]
+
         code = template.render(
             operation_id=operation_id,
             response_code=response_code,
-            properties=self.get_properties(model_schema, response_code is None),
+            models=models,
             description=model_schema.get('description', ''),
             example=model_schema.get('example', ''),
         )

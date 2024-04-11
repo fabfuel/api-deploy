@@ -1,0 +1,108 @@
+openapi: "3.0.1"
+info:
+  description: "Test API"
+  title: "Test"
+  version: "1"
+  contact:
+    name: Fabian Fuelling
+    email: api@fabfuel.de
+servers:
+  - url: "https://api.fabfuel.de/test"
+  - url: "https://api-staging.fabfuel.de/test"
+tags:
+  - name: Message
+    description: Message sending
+
+paths:
+  /-/message:
+    post:
+      operationId: createMessage
+      description: Create a new message
+      tags:
+        - Message
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              oneOf:
+                - $ref: '#/components/schemas/UserCreated'
+                - $ref: '#/components/schemas/ProjectCreated'
+              discriminator:
+                propertyName: message
+      responses:
+        "200":
+          $ref: "#/components/responses/CreateMessage"
+        "400":
+          $ref: "https://api.packmatic.io/types/responses/400-bad-request.yml"
+        "404":
+          $ref: "https://api.packmatic.io/types/responses/404-not-found.yml"
+        "500":
+          $ref: "https://api.packmatic.io/types/responses/500-server-error.yml"
+      x-amazon-apigateway-request-validator: "all"
+
+components:
+  schemas:
+
+    BaseMessage:
+      type: object
+      properties:
+        recipients:
+          type: array
+          minItems: 1
+          description: URN of the recipient, could be a User URN or a Role URN
+          example:
+            - urn:pm:users:pm.demo:user/1234-123456-123456-1234
+            - urn:pm:users:pm.demo:role/customer
+          items:
+            $ref: 'https://api.packmatic.io/types/schemas/urn.yml'
+
+        subject:
+          description: Subject of the notification
+          type: string
+
+        message:
+          type: string
+          description: Message to use for the notification
+#          example: 'CustomMessage'
+#          pattern: '^[a-z-]+$'
+          enum:
+            - UserCreated
+            - ProjectCreated
+
+
+    UserCreated:
+      allOf:
+        - $ref: '#/components/schemas/BaseMessage'
+        - type: object
+          properties:
+            parameters:
+              type: object
+              properties:
+                name:
+                  type: string
+                email:
+                  type: string
+
+    ProjectCreated:
+      allOf:
+        - $ref: '#/components/schemas/BaseMessage'
+        - type: object
+          properties:
+            parameters:
+              type: object
+              properties:
+                label:
+                  type: string
+                start:
+                  type: string
+                  format: datetime
+
+  responses:
+    CreateMessage:
+      description: Message
+
+x-amazon-apigateway-request-validators:
+  all:
+    validateRequestParameters: true
+    validateRequestBody: true

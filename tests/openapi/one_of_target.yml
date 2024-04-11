@@ -1,0 +1,433 @@
+openapi: 3.0.1
+info:
+  description: Test API
+  title: Test
+  version: '1'
+  contact:
+    name: Fabian Fuelling
+    email: api@fabfuel.de
+servers:
+- url: https://api.fabfuel.de/test
+tags:
+- name: Message
+  description: Message sending
+- name: Static Files
+  description: Static file content
+- name: CORS
+  description: CORS configuration endpoints
+paths:
+  /-/message:
+    post:
+      operationId: createMessage
+      description: Create a new message
+      tags:
+      - Message
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              oneOf:
+                - $ref: '#/components/schemas/UserCreated'
+                - $ref: '#/components/schemas/ProjectCreated'
+              discriminator:
+                propertyName: message
+      responses:
+        '200':
+          description: Message
+          headers:
+            Access-Control-Allow-Origin:
+              schema:
+                type: string
+                example: 'foo.com'
+        '400':
+          description: Bad Request
+          content:
+            application/json:
+              schema:
+                additionalProperties: false
+                properties:
+                  error:
+                    example: Bad Request
+                    type: string
+                  incident:
+                    description: Unique incident identifier
+                    example: 5beb965c-7ffc-468b-a063-eb47c5b366c2
+                    type: string
+                  message:
+                    example: Bad Request
+                    type: string
+                  statusCode:
+                    example: 400
+                    type: integer
+                required:
+                - statusCode
+                - message
+                type: object
+          headers:
+            Access-Control-Allow-Origin:
+              schema:
+                type: string
+                example: 'foo.com'
+        '404':
+          description: Not Found
+          content:
+            application/json:
+              schema:
+                additionalProperties: false
+                properties:
+                  error:
+                    example: Not Found
+                    type: string
+                  incident:
+                    description: Unique incident identifier
+                    example: 5beb965c-7ffc-468b-a063-eb47c5b366c2
+                    type: string
+                  message:
+                    example: Can not get entity /tasks/123
+                    type: string
+                  statusCode:
+                    example: 404
+                    type: integer
+                required:
+                - statusCode
+                - message
+                type: object
+          headers:
+            Access-Control-Allow-Origin:
+              schema:
+                type: string
+                example: 'foo.com'
+        '500':
+          description: Internal Server Error
+          content:
+            application/json:
+              schema:
+                additionalProperties: false
+                properties:
+                  error:
+                    example: Internal Server Error
+                    type: string
+                  incident:
+                    description: Unique incident identifier
+                    example: 5beb965c-7ffc-468b-a063-eb47c5b366c2
+                    type: string
+                  message:
+                    example: Internal Server Error
+                    type: string
+                  statusCode:
+                    example: 500
+                    type: integer
+                required:
+                - statusCode
+                - message
+                type: object
+
+          headers:
+            Access-Control-Allow-Origin:
+              schema:
+                type: string
+                example: 'foo.com'
+      x-amazon-apigateway-request-validator: all
+      parameters:
+      - name: host
+        in: header
+        required: false
+        schema:
+          type: string
+      - name: authorization
+        in: header
+        required: false
+        schema:
+          type: string
+      - name: x-datadog-trace-id
+        in: header
+        required: false
+        schema:
+          type: string
+      - name: x-datadog-parent-id
+        in: header
+        required: false
+        schema:
+          type: string
+      - name: x-datadog-origin
+        in: header
+        required: false
+        schema:
+          type: string
+      - in: header
+        name: x-datadog-sampling-priority
+        required: false
+        schema:
+          type: string
+      x-amazon-apigateway-integration:
+        type: http
+        connectionId: 1234567890
+        httpMethod: POST
+        uri: https://integration.com/-/message
+        passthroughBehavior: when_no_match
+        connectionType: VPC_LINK
+        responses:
+          default:
+            statusCode: '500'
+            responseParameters:
+              method.response.header.Access-Control-Allow-Origin: '''foo.com'''
+          '200':
+            statusCode: '200'
+            responseParameters:
+              method.response.header.Access-Control-Allow-Origin: '''foo.com'''
+          '400':
+            statusCode: '400'
+            responseParameters:
+              method.response.header.Access-Control-Allow-Origin: '''foo.com'''
+          '404':
+            statusCode: '404'
+            responseParameters:
+              method.response.header.Access-Control-Allow-Origin: '''foo.com'''
+        requestParameters:
+          integration.request.header.User-Agent: context.identity.userAgent
+          integration.request.header.X-Forwarded-For: context.identity.sourceIp
+          integration.request.header.X-Stage: context.stage
+          integration.request.header.host: method.request.header.host
+          integration.request.header.authorization: method.request.header.authorization
+          integration.request.header.x-datadog-trace-id: method.request.header.x-datadog-trace-id
+          integration.request.header.x-datadog-parent-id: method.request.header.x-datadog-parent-id
+          integration.request.header.x-datadog-origin: method.request.header.x-datadog-origin
+          integration.request.header.x-datadog-sampling-priority: method.request.header.x-datadog-sampling-priority
+    options:
+      operationId: /-/messageCORS
+      description: /-/message CORS
+      tags:
+      - CORS
+      responses:
+        '200':
+          description: '200'
+          headers:
+            Access-Control-Allow-Origin:
+              schema:
+                type: string
+                example: 'foo.com'
+            Access-Control-Allow-Methods:
+              schema:
+                type: string
+                example: POST,OPTIONS
+            Access-Control-Allow-Headers:
+              schema:
+                type: string
+                example: authorization,host,x-datadog-origin,x-datadog-parent-id,x-datadog-sampling-priority,x-datadog-trace-id
+      x-amazon-apigateway-integration:
+        responses:
+          default:
+            statusCode: '200'
+            responseParameters:
+              method.response.header.Access-Control-Allow-Methods: '''POST,OPTIONS'''
+              method.response.header.Access-Control-Allow-Headers: '''authorization,host,x-datadog-origin,x-datadog-parent-id,x-datadog-sampling-priority,x-datadog-trace-id'''
+              method.response.header.Access-Control-Allow-Origin: '''foo.com'''
+        requestTemplates:
+          application/json: '{"statusCode": 200}'
+        passthroughBehavior: when_no_match
+        type: mock
+  /api.v1.yml:
+    get:
+      tags:
+      - Static Files
+      responses:
+        '200':
+          description: Static file api.v1.yml
+          headers:
+            Access-Control-Allow-Origin:
+              schema:
+                type: string
+                example: 'foo.com'
+            Access-Control-Expose-Headers:
+              schema:
+                example: Content-Type
+                type: string
+            Content-Type:
+              schema:
+                example: text/yaml
+                type: string
+      parameters:
+      - name: host
+        in: header
+        required: false
+        schema:
+          type: string
+      - name: authorization
+        in: header
+        required: false
+        schema:
+          type: string
+      - name: x-datadog-trace-id
+        in: header
+        required: false
+        schema:
+          type: string
+      - name: x-datadog-parent-id
+        in: header
+        required: false
+        schema:
+          type: string
+      - name: x-datadog-origin
+        in: header
+        required: false
+        schema:
+          type: string
+      - name: x-datadog-sampling-priority
+        in: header
+        required: false
+        schema:
+          type: string
+      x-amazon-apigateway-integration:
+        type: http
+        connectionId: 1234567890
+        httpMethod: GET
+        uri: https://integration.com/api.v1.yml
+        passthroughBehavior: when_no_match
+        connectionType: VPC_LINK
+        responses:
+          default:
+            statusCode: '500'
+            responseParameters:
+              method.response.header.Access-Control-Allow-Origin: '''foo.com'''
+          '200':
+            statusCode: '200'
+            responseParameters:
+              method.response.header.Access-Control-Allow-Origin: '''foo.com'''
+              method.response.header.Access-Control-Expose-Headers: '''Content-Type'''
+              method.response.header.Content-Type: integration.response.header.Content-Type
+        requestParameters:
+          integration.request.header.User-Agent: context.identity.userAgent
+          integration.request.header.X-Forwarded-For: context.identity.sourceIp
+          integration.request.header.X-Stage: context.stage
+          integration.request.header.host: method.request.header.host
+          integration.request.header.authorization: method.request.header.authorization
+          integration.request.header.x-datadog-trace-id: method.request.header.x-datadog-trace-id
+          integration.request.header.x-datadog-parent-id: method.request.header.x-datadog-parent-id
+          integration.request.header.x-datadog-origin: method.request.header.x-datadog-origin
+          integration.request.header.x-datadog-sampling-priority: method.request.header.x-datadog-sampling-priority
+    options:
+      operationId: /api.v1.ymlCORS
+      description: /api.v1.yml CORS
+      tags:
+      - CORS
+      responses:
+        '200':
+          description: '200'
+          headers:
+            Access-Control-Allow-Origin:
+              schema:
+                type: string
+                example: 'foo.com'
+            Access-Control-Allow-Methods:
+              schema:
+                type: string
+                example: GET,OPTIONS
+            Access-Control-Allow-Headers:
+              schema:
+                type: string
+                example: authorization,host,x-datadog-origin,x-datadog-parent-id,x-datadog-sampling-priority,x-datadog-trace-id
+      x-amazon-apigateway-integration:
+        responses:
+          default:
+            statusCode: '200'
+            responseParameters:
+              method.response.header.Access-Control-Allow-Headers: '''authorization,host,x-datadog-origin,x-datadog-parent-id,x-datadog-sampling-priority,x-datadog-trace-id'''
+              method.response.header.Access-Control-Allow-Methods: '''GET,OPTIONS'''
+              method.response.header.Access-Control-Allow-Origin: '''foo.com'''
+        requestTemplates:
+          application/json: '{"statusCode": 200}'
+        passthroughBehavior: when_no_match
+        type: mock
+components:
+  schemas:
+    UserCreated:
+      type: object
+      additionalProperties: false
+      properties:
+        recipients:
+          type: array
+          minItems: 1
+          description: URN of the recipient, could be a User URN or a Role URN
+          example:
+            - urn:pm:users:pm.demo:user/1234-123456-123456-1234
+            - urn:pm:users:pm.demo:role/customer
+          items:
+            description: Uniform Resource Name
+            example: urn:pm:service::foobar/d9a6fc2e-a4b3-4fba-9f20-c5bd2fdb5071
+            pattern: ^urn:[\w-]+:[\w.-]*:[\w.-]*:[\w-]+\/[\w:-]+$
+            type: string
+
+        subject:
+          description: Subject of the notification
+          type: string
+        message:
+          type: string
+          description: Message to use for the notification
+          enum:
+            - UserCreated
+            - ProjectCreated
+        parameters:
+          type: object
+          additionalProperties: false
+          properties:
+            name:
+              type: string
+            email:
+              type: string
+          required:
+            - name
+            - email
+      required:
+       - recipients
+       - subject
+       - message
+       - parameters
+
+    ProjectCreated:
+      type: object
+      additionalProperties: false
+      properties:
+        recipients:
+          type: array
+          minItems: 1
+          description: URN of the recipient, could be a User URN or a Role URN
+          example:
+            - urn:pm:users:pm.demo:user/1234-123456-123456-1234
+            - urn:pm:users:pm.demo:role/customer
+          items:
+            description: Uniform Resource Name
+            example: urn:pm:service::foobar/d9a6fc2e-a4b3-4fba-9f20-c5bd2fdb5071
+            pattern: ^urn:[\w-]+:[\w.-]*:[\w.-]*:[\w-]+\/[\w:-]+$
+            type: string
+
+        subject:
+          description: Subject of the notification
+          type: string
+        message:
+          type: string
+          description: Message to use for the notification
+          enum:
+            - UserCreated
+            - ProjectCreated
+        parameters:
+          type: object
+          additionalProperties: false
+          properties:
+            label:
+              type: string
+            start:
+              type: string
+              format: datetime
+          required:
+          - label
+          - start
+      required:
+       - recipients
+       - subject
+       - message
+       - parameters
+x-amazon-apigateway-request-validators:
+  all:
+    validateRequestParameters: true
+    validateRequestBody: true

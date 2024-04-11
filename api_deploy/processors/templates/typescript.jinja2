@@ -1,7 +1,21 @@
 // THIS FILE IS GENERATED. DO NOT EDIT.
 
 {% if response_code %}
-export type {{ operation_id[0]|upper}}{{operation_id[1:] }}{{ response_code }}Response = {% include 'typescript.object.jinja2' %};
+export type {{ operation_id[0]|upper}}{{operation_id[1:] }}{{ response_code }}Response =
+    {%- for model in models %}
+        {% if models|length > 1 %}
+        |
+        {% endif %}
+        {% include 'typescript.object.jinja2' %}
+    {%- endfor %}
+    ;
 {% else %}
-export type {{ operation_id[0]|upper}}{{operation_id[1:] }}Request = {% include 'typescript.object.jinja2' %};
+export type {{ operation_id[0]|upper}}{{operation_id[1:] }}Request =
+    {%- for model in models %}
+        {% if models|length > 1 %}
+        |
+        {% endif %}
+        {% include 'typescript.object.jinja2' %}
+    {%- endfor %}
+    ;
 {% endif %}
