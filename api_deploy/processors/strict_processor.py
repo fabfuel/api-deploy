@@ -56,6 +56,14 @@ class StrictProcessor(AbstractProcessor):
         return schema
 
     def enable_strictness(self, model, add_required, remove_required=False):
+        if 'oneOf' in model:
+            for one_of_model in model['oneOf']:
+                self.enable_strictness(one_of_model, True)
+
+        if 'allOf' in model:
+            for all_of_model in model['allOf']:
+                self.enable_strictness(all_of_model, True)
+
         if model.get('type') != 'object':
             return model
 

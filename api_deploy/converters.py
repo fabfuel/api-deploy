@@ -81,6 +81,11 @@ class FlattenProcessor(AbstractProcessor):
             return self.lookup_ref(node, schema)
         elif self.is_ref(node):
             self.used_refs.add(self.get_ref_model_name(node['$ref']))
+        if self.is_one_of(node):
+            for one_of_model in node['oneOf']:
+                self.used_refs.add(self.get_ref_model_name(one_of_model['$ref']))
+
+            return node
         if self.is_all_of(node):
             return self.merge_all_of(node, schema)
         for key in node.keys():
@@ -173,6 +178,9 @@ class FlattenProcessor(AbstractProcessor):
 
     def is_all_of(self, node):
         return self.first_key(node) == 'allOf'
+
+    def is_one_of(self, node):
+        return self.first_key(node) == 'oneOf'
 
     def replace_refs_list(self, node, schema: Schema):
         new_list = []

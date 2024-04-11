@@ -1,5 +1,5 @@
 {
-{%- for property in properties %}
+{%- for property in model.properties %}
   /**
     * {{ property.name }}
 {%- if property.example %}
@@ -10,7 +10,7 @@
 
 {%- if 'object' in property.types -%}
     {%- if property.properties -%}
-        {% with properties=property.properties %}
+        {% with model=property %}
             {% include 'typescript.object.jinja2' %}
         {%- endwith -%}
     {%- else -%}
@@ -20,7 +20,9 @@
         | null
     {%- endif -%}
 {%- else -%}
-    {%- if property.enum -%}
+    {%- if property.name == model.discriminator_name -%}
+        '{{ model.discriminator_value }}'
+    {%- elif property.enum -%}
         ({{ property.enum|join(' | ') }})
     {%- else -%}
         {{ property.types|join(' | ') }}
