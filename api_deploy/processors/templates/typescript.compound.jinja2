@@ -1,0 +1,9 @@
+
+export type {{ type_name }} =
+    {%- for submodel in submodels %}
+        {% if submodels|length > 1 %}
+        |
+        {% endif %}
+        {{ submodel }}
+    {%- endfor %}
+    ;

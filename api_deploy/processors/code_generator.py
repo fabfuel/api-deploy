@@ -45,6 +45,19 @@ class CodeGenerator(AbstractProcessor):
 
         return schema
 
+    def get_type_name(self, operation_id, response_code, submodel_name=None):
+        type_name = f'{operation_id[0].upper()}{operation_id[1:]}'
+
+        if response_code:
+            type_name += f'{response_code}Response'
+        else:
+            type_name += 'Request'
+
+        if submodel_name:
+            type_name += submodel_name
+
+        return type_name
+
     def dump_model(self, language, schema, model_ref, operation_id, response_code=None, model_schema=None):
         if not model_schema:
             components, component_type, model_name = model_ref.split('/')[1:]
@@ -65,7 +78,9 @@ class CodeGenerator(AbstractProcessor):
         template = environment.get_template(f"{language}.jinja2")
 
         if 'oneOf' in model_schema:
-            models = []
+            code = ''
+
+            submodels = []
             for one_of_model in model_schema['oneOf']:
                 if '$ref' in one_of_model:
                     components, component_type, model_name = one_of_model['$ref'].split('/')[1:]
@@ -74,11 +89,33 @@ class CodeGenerator(AbstractProcessor):
                 else:
                     properties = self.get_properties(one_of_model, response_code is None)
 
-                models.append({
+                models = [{
                     'properties': properties,
                     'discriminator_name': model_schema.get('discriminator', {}).get('propertyName') or None,
                     'discriminator_value': model_name,
-                })
+                }]
+
+                type_name = self.get_type_name(operation_id, response_code, model_name)
+
+                code += template.render(
+                    type_name=type_name,
+                    response_code=response_code,
+                    models=models,
+                    description=model_schema.get('description', ''),
+                    example=model_schema.get('example', ''),
+                    discriminator_name=model_name,
+                )
+
+                submodels.append(self.get_type_name(operation_id, response_code, model_name))
+
+            if submodels:
+                compound_template = environment.get_template(f"{language}.compound.jinja2")
+
+                code += compound_template.render(
+                    type_name=self.get_type_name(operation_id, response_code),
+                    submodels=submodels,
+                )
+
         else:
             models = [{
                 'properties': self.get_properties(model_schema, response_code is None),
@@ -86,13 +123,13 @@ class CodeGenerator(AbstractProcessor):
                 'discriminator_value': None,
             }]
 
-        code = template.render(
-            operation_id=operation_id,
-            response_code=response_code,
-            models=models,
-            description=model_schema.get('description', ''),
-            example=model_schema.get('example', ''),
-        )
+            code = template.render(
+                type_name=self.get_type_name(operation_id, response_code),
+                response_code=response_code,
+                models=models,
+                description=model_schema.get('description', ''),
+                example=model_schema.get('example', ''),
+            )
 
         if response_code:
             file_path = f'{output_path}/{operation_id}.{response_code}.response.ts'
