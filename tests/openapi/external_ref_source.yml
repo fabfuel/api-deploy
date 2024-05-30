@@ -31,10 +31,30 @@ paths:
             application/json:
               schema:
                 $ref: '#/components/schemas/Test'
+  /test-two:
+    get:
+      tags:
+        - Test
+      summary: "Test 2"
+      operationId: "test2"
+      responses:
+        '200':
+          description: "Test 2"
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/TestTwo'
 
 components:
   schemas:
     Test:
+      allOf:
+      - $ref: 'https://api-staging.packmatic.io/types/schemas/metadata-item.yml'
+      - properties:
+          additionalField:
+            type: string
+
+    TestTwo:
       $ref: 'https://api-staging.packmatic.io/types/schemas/metadata-item.yml'
 
   parameters: { }

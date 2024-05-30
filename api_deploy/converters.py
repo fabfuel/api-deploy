@@ -196,7 +196,7 @@ class FlattenProcessor(AbstractProcessor):
         to_merge = []
         for sub_node in node['allOf']:
             if self.is_ref(sub_node):
-                to_merge.append(self.lookup_ref(deepcopy(sub_node), deepcopy(schema)))
+                to_merge.append(deepcopy(self.lookup_ref(deepcopy(sub_node), deepcopy(schema))))
             else:
                 to_merge.append(deepcopy(sub_node))
         return merge(*to_merge)
