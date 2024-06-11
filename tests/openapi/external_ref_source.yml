@@ -58,3 +58,9 @@ components:
       $ref: 'https://api-staging.packmatic.io/types/schemas/metadata-item.yml'
 
   parameters: { }
+
+  securitySchemes:
+    supplierAuth:
+      type: apiKey
+      in: header
+      name: x-supplier-auth

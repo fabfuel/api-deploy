@@ -830,4 +830,9 @@ components:
           description: Uniform Resource Name
           example: urn:pm:service::foobar/d9a6fc2e-a4b3-4fba-9f20-c5bd2fdb5071
           nullable: true
+  securitySchemes:
+    supplierAuth:
+      type: apiKey
+      in: header
+      name: x-supplier-auth
 x-amazon-apigateway-request-validators: {}
