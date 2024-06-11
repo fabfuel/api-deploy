@@ -233,9 +233,10 @@ class ApiGatewayProcessor(AbstractProcessor):
 
         # Replace all authorizers with API key type
         for authorizer in schema['components'].get('securitySchemes', {}):
+            scheme = schema['components']['securitySchemes'][authorizer]
             schema['components']['securitySchemes'][authorizer]['type'] = 'apiKey'
-            schema['components']['securitySchemes'][authorizer]['in'] = 'header'
-            schema['components']['securitySchemes'][authorizer]['name'] = 'Authorization'
+            schema['components']['securitySchemes'][authorizer]['in'] = scheme['in'] if 'in' in scheme else 'header'
+            schema['components']['securitySchemes'][authorizer]['name'] = scheme['name'] if 'name' in scheme else 'Authorization'
             schema['components']['securitySchemes'][authorizer]['flows'] = None
             del schema['components']['securitySchemes'][authorizer]['flows']
 
