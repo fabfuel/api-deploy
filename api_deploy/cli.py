@@ -27,7 +27,8 @@ def compile_file(config_file, source_file, target_file):
 
     except Exception as e:
         click.secho('Failed to compile OpenAPI file.', fg='red')
-        click.secho(str(e), fg='red')
+        click.secho(e, fg='red')
+        raise e
 
 
 @click.command()
