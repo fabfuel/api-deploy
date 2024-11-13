@@ -35,6 +35,12 @@ paths:
       responses:
         '200':
           description: Message
+          content:
+            application/json:
+              schema:
+                oneOf:
+                  - $ref: '#/components/schemas/UserCreated'
+                  - $ref: '#/components/schemas/ProjectCreated'
           headers:
             Access-Control-Allow-Origin:
               schema:

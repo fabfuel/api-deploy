@@ -27,10 +27,13 @@ class CodeGenerator(AbstractProcessor):
                             continue
 
                         if schema['paths'][path][method]['responses'][response_code]['content'].get('application/json'):
-                            response_model_ref = schema['paths'][path][method]['responses'][response_code]['content']['application/json']['schema'].get('$ref')
+                            response_model = schema['paths'][path][method]['responses'][response_code]['content']['application/json']['schema']
+                            response_model_ref = response_model.get('$ref')
 
                             if response_model_ref:
                                 self.dump_model(language, schema, response_model_ref, operation_id, response_code)
+                            else:
+                                self.dump_model(language, schema, None, operation_id, response_code, response_model)
                         else:
                             print(f'Warning, response {method.upper()} {path}@{response_code} has no response schema defined for content-type application/json')
 
@@ -169,7 +172,7 @@ class CodeGenerator(AbstractProcessor):
                 types = ['number']
                 sub_properties = []
             elif property_type == 'array':
-                types = [property_schema['items']['type']]
+                types = [property_schema['items'].get('type')]
                 if types == ['integer']:
                     types = ['number']
                 sub_properties = self.get_properties(property_schema['items'], writeOnly)

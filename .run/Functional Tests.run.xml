@@ -1,6 +1,7 @@
 <component name="ProjectRunConfigurationManager">
   <configuration default="false" name="Functional Tests" type="tests" factoryName="py.test">
     <module name="api-deploy" />
+    <option name="ENV_FILES" value="" />
     <option name="INTERPRETER_OPTIONS" value="" />
     <option name="PARENT_ENVS" value="true" />
     <option name="SDK_HOME" value="" />
@@ -18,6 +19,11 @@
       <ENTRIES>
         <ENTRY IS_ENABLED="true" PARSER="runconfig" IS_EXECUTABLE="false" />
       </ENTRIES>
+    </EXTENSION>
+    <EXTENSION ID="software.aws.toolkits.jetbrains.core.execution.PythonAwsConnectionExtension">
+      <option name="credential" />
+      <option name="region" />
+      <option name="useCurrentConnection" value="false" />
     </EXTENSION>
     <option name="_new_keywords" value="&quot;&quot;" />
     <option name="_new_parameters" value="&quot;&quot;" />

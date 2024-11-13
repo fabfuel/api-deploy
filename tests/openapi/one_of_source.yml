@@ -101,6 +101,12 @@ components:
   responses:
     CreateMessage:
       description: Message
+      content:
+        application/json:
+          schema:
+            oneOf:
+              - $ref: '#/components/schemas/UserCreated'
+              - $ref: '#/components/schemas/ProjectCreated'
 
 x-amazon-apigateway-request-validators:
   all:
