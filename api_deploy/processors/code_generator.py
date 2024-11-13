@@ -23,6 +23,9 @@ class CodeGenerator(AbstractProcessor):
                         continue
 
                     for response_code in schema['paths'][path][method]['responses']:
+                        if response_code != "200":
+                            continue
+
                         if not schema['paths'][path][method]['responses'][response_code].get('content'):
                             continue
 
