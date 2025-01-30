@@ -836,3 +836,4 @@ components:
       in: header
       name: x-supplier-auth
 x-amazon-apigateway-request-validators: {}
+x-amazon-apigateway-minimum-compression-size: 0

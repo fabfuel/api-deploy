@@ -2108,3 +2108,4 @@ components:
         authorizerUri: arn:aws:apigateway:eu-central-1:lambda:path/1
         authorizerResultTtlInSeconds: 300
 x-amazon-apigateway-request-validators: {}
+x-amazon-apigateway-minimum-compression-size: 0
