@@ -32,5 +32,6 @@ class Schema(YamlDict):
             'paths': self['paths'],
             'components': self.get('components', {}),
             'x-amazon-apigateway-request-validators': self.get('x-amazon-apigateway-request-validators', {}),
+            'x-amazon-apigateway-minimum-compression-size': 0                                   ,
         }
         return yaml.dump(data, sort_keys=sort_keys)

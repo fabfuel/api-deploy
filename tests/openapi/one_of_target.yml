@@ -437,3 +437,4 @@ x-amazon-apigateway-request-validators:
   all:
     validateRequestParameters: true
     validateRequestBody: true
+x-amazon-apigateway-minimum-compression-size: 0
