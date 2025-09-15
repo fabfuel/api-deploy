@@ -361,7 +361,7 @@ components:
           items:
             description: Uniform Resource Name
             example: urn:pm:service::foobar/d9a6fc2e-a4b3-4fba-9f20-c5bd2fdb5071
-            pattern: ^urn:[\w-]+:[\w.-]*:[\w.-]*:[\w-]+\/[\w:-]+$
+            pattern: ^urn:[\w-]+:[\w.-]*:[\w.-]*:[\w-]+\/[^\/]+$
             type: string
 
         subject:
@@ -404,7 +404,7 @@ components:
           items:
             description: Uniform Resource Name
             example: urn:pm:service::foobar/d9a6fc2e-a4b3-4fba-9f20-c5bd2fdb5071
-            pattern: ^urn:[\w-]+:[\w.-]*:[\w.-]*:[\w-]+\/[\w:-]+$
+            pattern: ^urn:[\w-]+:[\w.-]*:[\w.-]*:[\w-]+\/[^\/]+$
             type: string
 
         subject:
