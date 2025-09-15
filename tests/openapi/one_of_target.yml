@@ -41,6 +41,7 @@ paths:
                 oneOf:
                   - $ref: '#/components/schemas/UserCreated'
                   - $ref: '#/components/schemas/ProjectCreated'
+                  - $ref: '#/components/schemas/MessageList'
           headers:
             Access-Control-Allow-Origin:
               schema:
@@ -361,7 +362,7 @@ components:
           items:
             description: Uniform Resource Name
             example: urn:pm:service::foobar/d9a6fc2e-a4b3-4fba-9f20-c5bd2fdb5071
-            pattern: ^urn:[\w-]+:[\w.-]*:[\w.-]*:[\w-]+\/[\w:-]+$
+            pattern: ^urn:[\w-]+:[\w.-]*:[\w.-]*:[\w-]+\/[^\/]+$
             type: string
 
         subject:
@@ -389,7 +390,11 @@ components:
        - subject
        - message
        - parameters
-
+    MessageList:
+      items:
+        additionalProperties: true
+        type: object
+      type: array
     ProjectCreated:
       type: object
       additionalProperties: false
@@ -404,7 +409,7 @@ components:
           items:
             description: Uniform Resource Name
             example: urn:pm:service::foobar/d9a6fc2e-a4b3-4fba-9f20-c5bd2fdb5071
-            pattern: ^urn:[\w-]+:[\w.-]*:[\w.-]*:[\w-]+\/[\w:-]+$
+            pattern: ^urn:[\w-]+:[\w.-]*:[\w.-]*:[\w-]+\/[^\/]+$
             type: string
 
         subject:

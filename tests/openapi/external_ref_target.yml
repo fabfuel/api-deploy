@@ -740,7 +740,7 @@ components:
           readOnly: true
         urn:
           type: string
-          pattern: ^urn:[\w-]+:[\w.-]*:[\w.-]*:[\w-]+\/[\w:-]+$
+          pattern: ^urn:[\w-]+:[\w.-]*:[\w.-]*:[\w-]+\/[^\/]+$
           description: Uniform Resource Name
           example: urn:pm:service::foobar/d9a6fc2e-a4b3-4fba-9f20-c5bd2fdb5071
         tenant:
@@ -762,7 +762,7 @@ components:
           format: date-time
         createdBy:
           type: string
-          pattern: ^urn:[\w-]+:[\w.-]*:[\w.-]*:[\w-]+\/[\w:-]+$
+          pattern: ^urn:[\w-]+:[\w.-]*:[\w.-]*:[\w-]+\/[^\/]+$
           description: Uniform Resource Name
           example: urn:pm:service::foobar/d9a6fc2e-a4b3-4fba-9f20-c5bd2fdb5071
         modifiedAt:
@@ -771,7 +771,7 @@ components:
           nullable: true
         modifiedBy:
           type: string
-          pattern: ^urn:[\w-]+:[\w.-]*:[\w.-]*:[\w-]+\/[\w:-]+$
+          pattern: ^urn:[\w-]+:[\w.-]*:[\w.-]*:[\w-]+\/[^\/]+$
           description: Uniform Resource Name
           example: urn:pm:service::foobar/d9a6fc2e-a4b3-4fba-9f20-c5bd2fdb5071
           nullable: true
@@ -795,7 +795,7 @@ components:
           readOnly: true
         urn:
           type: string
-          pattern: ^urn:[\w-]+:[\w.-]*:[\w.-]*:[\w-]+\/[\w:-]+$
+          pattern: ^urn:[\w-]+:[\w.-]*:[\w.-]*:[\w-]+\/[^\/]+$
           description: Uniform Resource Name
           example: urn:pm:service::foobar/d9a6fc2e-a4b3-4fba-9f20-c5bd2fdb5071
         tenant:
@@ -817,7 +817,7 @@ components:
           format: date-time
         createdBy:
           type: string
-          pattern: ^urn:[\w-]+:[\w.-]*:[\w.-]*:[\w-]+\/[\w:-]+$
+          pattern: ^urn:[\w-]+:[\w.-]*:[\w.-]*:[\w-]+\/[^\/]+$
           description: Uniform Resource Name
           example: urn:pm:service::foobar/d9a6fc2e-a4b3-4fba-9f20-c5bd2fdb5071
         modifiedAt:
@@ -826,7 +826,7 @@ components:
           nullable: true
         modifiedBy:
           type: string
-          pattern: ^urn:[\w-]+:[\w.-]*:[\w.-]*:[\w-]+\/[\w:-]+$
+          pattern: ^urn:[\w-]+:[\w.-]*:[\w.-]*:[\w-]+\/[^\/]+$
           description: Uniform Resource Name
           example: urn:pm:service::foobar/d9a6fc2e-a4b3-4fba-9f20-c5bd2fdb5071
           nullable: true
