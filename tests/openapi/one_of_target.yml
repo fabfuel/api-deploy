@@ -390,6 +390,7 @@ components:
        - subject
        - message
        - parameters
+
     MessageList:
       items:
         additionalProperties: true
