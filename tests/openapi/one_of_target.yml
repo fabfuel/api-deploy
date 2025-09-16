@@ -41,6 +41,7 @@ paths:
                 oneOf:
                   - $ref: '#/components/schemas/UserCreated'
                   - $ref: '#/components/schemas/ProjectCreated'
+                  - $ref: '#/components/schemas/MessageList'
           headers:
             Access-Control-Allow-Origin:
               schema:
@@ -390,6 +391,11 @@ components:
        - message
        - parameters
 
+    MessageList:
+      items:
+        additionalProperties: true
+        type: object
+      type: array
     ProjectCreated:
       type: object
       additionalProperties: false
