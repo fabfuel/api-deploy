@@ -1252,6 +1252,7 @@ components:
                 - attachments
                 - comment
                 - state
+                - offerCode
                 - stateTransitions
                 - _meta
                 - _links
@@ -1307,6 +1308,13 @@ components:
                     enum:
                     - draft
                     - submitted
+                  offerCode:
+                    type: string
+                    readOnly: true
+                    enum:
+                      - "0116"
+                      - "0118"
+                      - "0119"
                   stateTransitions:
                     type: array
                     readOnly: true
@@ -1704,6 +1712,7 @@ components:
       - attachments
       - comment
       - state
+      - offerCode
       - stateTransitions
       - _meta
       - _links
@@ -1759,6 +1768,13 @@ components:
           enum:
           - draft
           - submitted
+        offerCode:
+          type: string
+          readOnly: true
+          enum:
+            - "0116"
+            - "0118"
+            - "0119"
         stateTransitions:
           type: array
           readOnly: true
