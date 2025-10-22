@@ -403,6 +403,13 @@ components:
           enum:
             - draft
             - submitted
+        offerCode:
+          type: string
+          readOnly: true
+          enum:
+            - "0116"
+            - "0118"
+            - "0119"
         stateTransitions:
           $ref: "#/components/schemas/StateTransitionList"
         _meta:
