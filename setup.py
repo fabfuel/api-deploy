@@ -15,7 +15,7 @@ dependencies = [
     'click>=8.1.3, <9',
     'mergedeep>=1.3.4',
     'boto3>=1.26.118',
-    'PyYAML>=6.0',
+    'ruyaml>=0.91',
     'requests>=2.31.0',
     'Jinja2==3.1.2',
     'urllib3<2',

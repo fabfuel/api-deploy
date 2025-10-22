@@ -1,12 +1,35 @@
 from typing import Dict
-import yaml
+import io
+import ruyaml
 
-yaml.Dumper.ignore_aliases = lambda *args: True
+_yaml = ruyaml.YAML(typ='safe')
+# avoid YAML aliases/anchors in output
+_yaml.representer.ignore_aliases = lambda *args: True
+
+
+def _dump_to_string(data, sort_keys=False):
+    # Optional key sorting to mimic previous behavior when requested
+    def _sort(obj):
+        if isinstance(obj, dict):
+            # sort by key, recursively
+            return {k: _sort(obj[k]) for k in sorted(obj.keys())}
+        if isinstance(obj, list):
+            return [
+                _sort(i) for i in obj
+            ]
+        return obj
+
+    if sort_keys:
+        data = _sort(data)
+    stream = io.StringIO()
+    _yaml.dump(data, stream)
+    return stream.getvalue()
 
 
 class YamlDict(Dict):
     def __init__(self, schema) -> None:
-        content = yaml.load(schema, yaml.Loader) or {}
+        # ruyaml.YAML.load accepts str, bytes, and file-like objects
+        content = _yaml.load(schema) or {}
         super().__init__(content)
 
     @classmethod
@@ -19,7 +42,7 @@ class YamlDict(Dict):
             target.write(self.dump())
 
     def dump(self, sort_keys=False):
-        return yaml.dump(self, sort_keys=sort_keys)
+        return _dump_to_string(self, sort_keys=sort_keys)
 
 
 class Schema(YamlDict):
@@ -34,4 +57,4 @@ class Schema(YamlDict):
             'x-amazon-apigateway-request-validators': self.get('x-amazon-apigateway-request-validators', {}),
             'x-amazon-apigateway-minimum-compression-size': 0                                   ,
         }
-        return yaml.dump(data, sort_keys=sort_keys)
+        return _dump_to_string(data, sort_keys=sort_keys)
