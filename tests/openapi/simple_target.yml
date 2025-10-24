@@ -1,102 +1,238 @@
-openapi: 3.0.1
+components:
+  schemas:
+    ErrorResponse:
+      additionalProperties: false
+      properties:
+        code:
+          example: 500
+          type: integer
+        incident:
+          description: Unique incident identifier
+          example: 5beb965c-7ffc-468b-a063-eb47c5b366c2
+          type: string
+        message:
+          example: Internal Server Error
+          type: string
+      required:
+      - code
+      - message
+      - incident
+      type: object
+    ErrorResponseBadRequest:
+      additionalProperties: false
+      properties:
+        code:
+          example: 400
+          type: integer
+        incident:
+          description: Unique incident identifier
+          example: 5beb965c-7ffc-468b-a063-eb47c5b366c2
+          type: string
+        message:
+          example: Bad Request
+          type: string
+      required:
+      - code
+      - message
+      - incident
+      type: object
+    ErrorResponseNotFound:
+      additionalProperties: false
+      properties:
+        code:
+          example: 404
+          type: integer
+        incident:
+          description: Unique incident identifier
+          example: 5beb965c-7ffc-468b-a063-eb47c5b366c2
+          type: string
+        message:
+          example: Not Found
+          type: string
+      required:
+      - code
+      - message
+      - incident
+      type: object
+    PingPayload:
+      additionalProperties: false
+      properties:
+        _embedded:
+          additionalProperties: false
+          properties:
+            mandatory:
+              type: string
+            preference:
+              type: string
+          required:
+          - mandatory
+          type: object
+        _not_required:
+          additionalProperties: false
+          properties:
+            optionalA:
+              type: string
+            optionalB:
+              type: string
+          type: object
+        _not_strict:
+          properties:
+            optionalA:
+              type: string
+            optionalB:
+              type: string
+          type: object
+        category:
+          enum:
+          - null
+          - machine
+          - human
+          - other
+          nullable: true
+          type: string
+        directions:
+          items:
+            enum:
+            - north
+            - east
+            - south
+            - west
+            - '1190'
+            - '0119'
+            type: string
+          type: array
+        locations:
+          items:
+            type: string
+          type: array
+        ping:
+          example: pong
+          type: string
+        pingAt:
+          format: date-time
+          type: string
+        pingBy:
+          description: Unique user identifier
+          example: user@server.com
+          type: string
+        priority:
+          default: 0
+          enum:
+          - 0
+          - 10
+          - 20
+          - 30
+          - 40
+          type: integer
+      required:
+      - ping
+      - category
+      type: object
+    PingPayloadPatch:
+      additionalProperties: false
+      properties:
+        _embedded:
+          additionalProperties: false
+          properties:
+            mandatory:
+              type: string
+            preference:
+              type: string
+          type: object
+        _not_required:
+          additionalProperties: false
+          properties:
+            optionalA:
+              type: string
+            optionalB:
+              type: string
+          type: object
+        _not_strict:
+          properties:
+            optionalA:
+              type: string
+            optionalB:
+              type: string
+          type: object
+        category:
+          enum:
+          - null
+          - machine
+          - human
+          - other
+          nullable: true
+          type: string
+        directions:
+          items:
+            enum:
+            - north
+            - east
+            - south
+            - west
+            - '1190'
+            - '0119'
+            type: string
+          type: array
+        locations:
+          items:
+            type: string
+          type: array
+        ping:
+          example: pong
+          type: string
+        pingAt:
+          format: date-time
+          type: string
+        pingBy:
+          description: Unique user identifier
+          example: user@server.com
+          type: string
+        priority:
+          default: 0
+          enum:
+          - 0
+          - 10
+          - 20
+          - 30
+          - 40
+          type: integer
+      type: object
 info:
+  contact:
+    email: api@fabfuel.de
+    name: Fabian Fuelling
   description: Test API
   title: Test
   version: '1'
-  contact:
-    name: Fabian Fuelling
-    email: api@fabfuel.de
-servers:
-- url: https://api.fabfuel.de/test
-tags:
-- name: Health
-  description: Ping and health check endpoints
-- name: Static Files
-  description: Static file content
-- name: CORS
-  description: CORS configuration endpoints
+openapi: 3.0.1
 paths:
   /-/ping:
     get:
-      operationId: ping
       description: Receive a ping response
-      tags:
-      - Health
-      responses:
-        '200':
-          description: Ping
-          content:
-            application/json:
-              schema:
-                $ref: '#/components/schemas/PingPayload'
-          headers:
-            x-ping:
-              schema:
-                type: string
-            Access-Control-Allow-Origin:
-              schema:
-                type: string
-                example: 'foo.com'
-            Access-Control-Expose-Headers:
-              schema:
-                type: string
-                example: 'x-ping'
-        '400':
-          description: Bad Request
-          content:
-            application/json:
-              schema:
-                $ref: '#/components/schemas/ErrorResponseBadRequest'
-          headers:
-            Access-Control-Allow-Origin:
-              schema:
-                type: string
-                example: 'foo.com'
-        '404':
-          description: Not Found
-          content:
-            application/json:
-              schema:
-                $ref: '#/components/schemas/ErrorResponseNotFound'
-          headers:
-            Access-Control-Allow-Origin:
-              schema:
-                type: string
-                example: 'foo.com'
-        '500':
-          description: Internal Server Error
-          content:
-            application/json:
-              schema:
-                $ref: '#/components/schemas/ErrorResponse'
-          headers:
-            Access-Control-Allow-Origin:
-              schema:
-                type: string
-                example: 'foo.com'
+      operationId: ping
       parameters:
-      - name: host
-        in: header
+      - in: header
+        name: host
         required: false
         schema:
           type: string
-      - name: authorization
-        in: header
+      - in: header
+        name: authorization
         required: false
         schema:
           type: string
-      - name: x-datadog-trace-id
-        in: header
+      - in: header
+        name: x-datadog-trace-id
         required: false
         schema:
           type: string
-      - name: x-datadog-parent-id
-        in: header
+      - in: header
+        name: x-datadog-parent-id
         required: false
         schema:
           type: string
-      - name: x-datadog-origin
-        in: header
+      - in: header
+        name: x-datadog-origin
         required: false
         schema:
           type: string
@@ -105,349 +241,432 @@ paths:
         required: false
         schema:
           type: string
-      x-amazon-apigateway-integration:
-        type: http
-        connectionId: 1234567890
-        httpMethod: GET
-        uri: https://integration.com/-/ping
-        passthroughBehavior: when_no_match
-        connectionType: VPC_LINK
-        responses:
-          default:
-            statusCode: '500'
-            responseParameters:
-              method.response.header.Access-Control-Allow-Origin: '''foo.com'''
-          '200':
-            statusCode: '200'
-            responseParameters:
-              method.response.header.Access-Control-Allow-Origin: '''foo.com'''
-              method.response.header.Access-Control-Expose-Headers: '''x-ping'''
-              method.response.header.x-ping: integration.response.header.x-ping
-          '400':
-            statusCode: '400'
-            responseParameters:
-              method.response.header.Access-Control-Allow-Origin: '''foo.com'''
-          '404':
-            statusCode: '404'
-            responseParameters:
-              method.response.header.Access-Control-Allow-Origin: '''foo.com'''
-        requestParameters:
-          integration.request.header.User-Agent: context.identity.userAgent
-          integration.request.header.X-Forwarded-For: context.identity.sourceIp
-          integration.request.header.X-Stage: context.stage
-          integration.request.header.host: method.request.header.host
-          integration.request.header.authorization: method.request.header.authorization
-          integration.request.header.x-datadog-trace-id: method.request.header.x-datadog-trace-id
-          integration.request.header.x-datadog-parent-id: method.request.header.x-datadog-parent-id
-          integration.request.header.x-datadog-origin: method.request.header.x-datadog-origin
-          integration.request.header.x-datadog-sampling-priority: method.request.header.x-datadog-sampling-priority
-    post:
-      operationId: pingPost
-      description: Post a custom Ping request
-      tags:
-      - Health
-      requestBody:
-        required: true
-        content:
-          application/json:
-            schema:
-              $ref: '#/components/schemas/PingPayload'
       responses:
         '200':
-          description: Ping
           content:
             application/json:
               schema:
                 $ref: '#/components/schemas/PingPayload'
-          headers:
-            x-ping:
-              schema:
-                type: string
-            Access-Control-Allow-Origin:
-              schema:
-                type: string
-                example: 'foo.com'
-            Access-Control-Expose-Headers:
-              schema:
-                type: string
-                example: 'x-ping'
-        '400':
-          description: Bad Request
-          content:
-            application/json:
-              schema:
-                $ref: '#/components/schemas/ErrorResponseBadRequest'
-          headers:
-            Access-Control-Allow-Origin:
-              schema:
-                type: string
-                example: 'foo.com'
-        '404':
-          description: Not Found
-          content:
-            application/json:
-              schema:
-                $ref: '#/components/schemas/ErrorResponseNotFound'
-          headers:
-            Access-Control-Allow-Origin:
-              schema:
-                type: string
-                example: 'foo.com'
-        '500':
-          description: Internal Server Error
-          content:
-            application/json:
-              schema:
-                $ref: '#/components/schemas/ErrorResponse'
-          headers:
-            Access-Control-Allow-Origin:
-              schema:
-                type: string
-                example: 'foo.com'
-      x-amazon-apigateway-request-validator: all
-      parameters:
-      - name: host
-        in: header
-        required: false
-        schema:
-          type: string
-      - name: authorization
-        in: header
-        required: false
-        schema:
-          type: string
-      - name: x-datadog-trace-id
-        in: header
-        required: false
-        schema:
-          type: string
-      - name: x-datadog-parent-id
-        in: header
-        required: false
-        schema:
-          type: string
-      - name: x-datadog-origin
-        in: header
-        required: false
-        schema:
-          type: string
-      - in: header
-        name: x-datadog-sampling-priority
-        required: false
-        schema:
-          type: string
-      x-amazon-apigateway-integration:
-        type: http
-        connectionId: 1234567890
-        httpMethod: POST
-        uri: https://integration.com/-/ping
-        passthroughBehavior: when_no_match
-        connectionType: VPC_LINK
-        responses:
-          default:
-            statusCode: '500'
-            responseParameters:
-              method.response.header.Access-Control-Allow-Origin: '''foo.com'''
-          '200':
-            statusCode: '200'
-            responseParameters:
-              method.response.header.Access-Control-Allow-Origin: '''foo.com'''
-              method.response.header.Access-Control-Expose-Headers: '''x-ping'''
-              method.response.header.x-ping: integration.response.header.x-ping
-          '400':
-            statusCode: '400'
-            responseParameters:
-              method.response.header.Access-Control-Allow-Origin: '''foo.com'''
-          '404':
-            statusCode: '404'
-            responseParameters:
-              method.response.header.Access-Control-Allow-Origin: '''foo.com'''
-        requestParameters:
-          integration.request.header.User-Agent: context.identity.userAgent
-          integration.request.header.X-Forwarded-For: context.identity.sourceIp
-          integration.request.header.X-Stage: context.stage
-          integration.request.header.host: method.request.header.host
-          integration.request.header.authorization: method.request.header.authorization
-          integration.request.header.x-datadog-trace-id: method.request.header.x-datadog-trace-id
-          integration.request.header.x-datadog-parent-id: method.request.header.x-datadog-parent-id
-          integration.request.header.x-datadog-origin: method.request.header.x-datadog-origin
-          integration.request.header.x-datadog-sampling-priority: method.request.header.x-datadog-sampling-priority
-    patch:
-      operationId: pingPatch
-      description: Patch a custom Ping request
-      tags:
-      - Health
-      requestBody:
-        required: true
-        content:
-          application/json:
-            schema:
-              $ref: '#/components/schemas/PingPayloadPatch'
-      responses:
-        '200':
           description: Ping
-          content:
-            application/json:
-              schema:
-                $ref: '#/components/schemas/PingPayload'
           headers:
-            x-ping:
+            Access-Control-Allow-Origin:
               schema:
+                example: foo.com
                 type: string
             Access-Control-Expose-Headers:
               schema:
-                type: string
                 example: x-ping
-            Access-Control-Allow-Origin:
+                type: string
+            x-ping:
               schema:
                 type: string
-                example: foo.com
         '400':
-          description: Bad Request
           content:
             application/json:
               schema:
                 $ref: '#/components/schemas/ErrorResponseBadRequest'
+          description: Bad Request
           headers:
             Access-Control-Allow-Origin:
               schema:
-                type: string
                 example: foo.com
+                type: string
         '404':
-          description: Not Found
           content:
             application/json:
               schema:
                 $ref: '#/components/schemas/ErrorResponseNotFound'
+          description: Not Found
           headers:
             Access-Control-Allow-Origin:
               schema:
-                type: string
                 example: foo.com
+                type: string
         '500':
-          description: Internal Server Error
           content:
             application/json:
               schema:
                 $ref: '#/components/schemas/ErrorResponse'
+          description: Internal Server Error
           headers:
             Access-Control-Allow-Origin:
               schema:
-                type: string
                 example: foo.com
-      x-amazon-apigateway-request-validator: all
-      parameters:
-      - name: host
-        in: header
-        required: false
-        schema:
-          type: string
-      - name: authorization
-        in: header
-        required: false
-        schema:
-          type: string
-      - name: x-datadog-trace-id
-        in: header
-        required: false
-        schema:
-          type: string
-      - name: x-datadog-parent-id
-        in: header
-        required: false
-        schema:
-          type: string
-      - name: x-datadog-origin
-        in: header
-        required: false
-        schema:
-          type: string
-      - name: x-datadog-sampling-priority
-        in: header
-        required: false
-        schema:
-          type: string
+                type: string
+      tags:
+      - Health
       x-amazon-apigateway-integration:
-        type: http
         connectionId: 1234567890
-        httpMethod: PATCH
-        uri: https://integration.com/-/ping
-        passthroughBehavior: when_no_match
         connectionType: VPC_LINK
-        responses:
-          default:
-            statusCode: '500'
-            responseParameters:
-              method.response.header.Access-Control-Allow-Origin: '''foo.com'''
-          '200':
-            statusCode: '200'
-            responseParameters:
-              method.response.header.x-ping: integration.response.header.x-ping
-              method.response.header.Access-Control-Allow-Origin: '''foo.com'''
-              method.response.header.Access-Control-Expose-Headers: '''x-ping'''
-          '400':
-            statusCode: '400'
-            responseParameters:
-              method.response.header.Access-Control-Allow-Origin: '''foo.com'''
-          '404':
-            statusCode: '404'
-            responseParameters:
-              method.response.header.Access-Control-Allow-Origin: '''foo.com'''
+        httpMethod: GET
+        passthroughBehavior: when_no_match
         requestParameters:
           integration.request.header.User-Agent: context.identity.userAgent
           integration.request.header.X-Forwarded-For: context.identity.sourceIp
           integration.request.header.X-Stage: context.stage
-          integration.request.header.host: method.request.header.host
           integration.request.header.authorization: method.request.header.authorization
-          integration.request.header.x-datadog-trace-id: method.request.header.x-datadog-trace-id
-          integration.request.header.x-datadog-parent-id: method.request.header.x-datadog-parent-id
+          integration.request.header.host: method.request.header.host
           integration.request.header.x-datadog-origin: method.request.header.x-datadog-origin
+          integration.request.header.x-datadog-parent-id: method.request.header.x-datadog-parent-id
           integration.request.header.x-datadog-sampling-priority: method.request.header.x-datadog-sampling-priority
+          integration.request.header.x-datadog-trace-id: method.request.header.x-datadog-trace-id
+        responses:
+          '200':
+            responseParameters:
+              method.response.header.Access-Control-Allow-Origin: '''foo.com'''
+              method.response.header.Access-Control-Expose-Headers: '''x-ping'''
+              method.response.header.x-ping: integration.response.header.x-ping
+            statusCode: '200'
+          '400':
+            responseParameters:
+              method.response.header.Access-Control-Allow-Origin: '''foo.com'''
+            statusCode: '400'
+          '404':
+            responseParameters:
+              method.response.header.Access-Control-Allow-Origin: '''foo.com'''
+            statusCode: '404'
+          default:
+            responseParameters:
+              method.response.header.Access-Control-Allow-Origin: '''foo.com'''
+            statusCode: '500'
+        type: http
+        uri: https://integration.com/-/ping
     options:
-      operationId: /-/pingCORS
       description: /-/ping CORS
-      tags:
-      - CORS
+      operationId: /-/pingCORS
       responses:
         '200':
           description: '200'
           headers:
-            Access-Control-Allow-Origin:
-              schema:
-                type: string
-                example: 'foo.com'
-            Access-Control-Allow-Methods:
-              schema:
-                type: string
-                example: GET,POST,PATCH,OPTIONS
             Access-Control-Allow-Headers:
               schema:
-                type: string
                 example: authorization,host,x-datadog-origin,x-datadog-parent-id,x-datadog-sampling-priority,x-datadog-trace-id
+                type: string
+            Access-Control-Allow-Methods:
+              schema:
+                example: GET,POST,PATCH,OPTIONS
+                type: string
+            Access-Control-Allow-Origin:
+              schema:
+                example: foo.com
+                type: string
+      tags:
+      - CORS
       x-amazon-apigateway-integration:
-        responses:
-          default:
-            statusCode: '200'
-            responseParameters:
-              method.response.header.Access-Control-Allow-Methods: '''GET,POST,PATCH,OPTIONS'''
-              method.response.header.Access-Control-Allow-Headers: '''authorization,host,x-datadog-origin,x-datadog-parent-id,x-datadog-sampling-priority,x-datadog-trace-id'''
-              method.response.header.Access-Control-Allow-Origin: '''foo.com'''
+        passthroughBehavior: when_no_match
         requestTemplates:
           application/json: '{"statusCode": 200}'
-        passthroughBehavior: when_no_match
+        responses:
+          default:
+            responseParameters:
+              method.response.header.Access-Control-Allow-Headers: '''authorization,host,x-datadog-origin,x-datadog-parent-id,x-datadog-sampling-priority,x-datadog-trace-id'''
+              method.response.header.Access-Control-Allow-Methods: '''GET,POST,PATCH,OPTIONS'''
+              method.response.header.Access-Control-Allow-Origin: '''foo.com'''
+            statusCode: '200'
         type: mock
+    patch:
+      description: Patch a custom Ping request
+      operationId: pingPatch
+      parameters:
+      - in: header
+        name: host
+        required: false
+        schema:
+          type: string
+      - in: header
+        name: authorization
+        required: false
+        schema:
+          type: string
+      - in: header
+        name: x-datadog-trace-id
+        required: false
+        schema:
+          type: string
+      - in: header
+        name: x-datadog-parent-id
+        required: false
+        schema:
+          type: string
+      - in: header
+        name: x-datadog-origin
+        required: false
+        schema:
+          type: string
+      - in: header
+        name: x-datadog-sampling-priority
+        required: false
+        schema:
+          type: string
+      requestBody:
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/PingPayloadPatch'
+        required: true
+      responses:
+        '200':
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/PingPayload'
+          description: Ping
+          headers:
+            Access-Control-Allow-Origin:
+              schema:
+                example: foo.com
+                type: string
+            Access-Control-Expose-Headers:
+              schema:
+                example: x-ping
+                type: string
+            x-ping:
+              schema:
+                type: string
+        '400':
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ErrorResponseBadRequest'
+          description: Bad Request
+          headers:
+            Access-Control-Allow-Origin:
+              schema:
+                example: foo.com
+                type: string
+        '404':
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ErrorResponseNotFound'
+          description: Not Found
+          headers:
+            Access-Control-Allow-Origin:
+              schema:
+                example: foo.com
+                type: string
+        '500':
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ErrorResponse'
+          description: Internal Server Error
+          headers:
+            Access-Control-Allow-Origin:
+              schema:
+                example: foo.com
+                type: string
+      tags:
+      - Health
+      x-amazon-apigateway-integration:
+        connectionId: 1234567890
+        connectionType: VPC_LINK
+        httpMethod: PATCH
+        passthroughBehavior: when_no_match
+        requestParameters:
+          integration.request.header.User-Agent: context.identity.userAgent
+          integration.request.header.X-Forwarded-For: context.identity.sourceIp
+          integration.request.header.X-Stage: context.stage
+          integration.request.header.authorization: method.request.header.authorization
+          integration.request.header.host: method.request.header.host
+          integration.request.header.x-datadog-origin: method.request.header.x-datadog-origin
+          integration.request.header.x-datadog-parent-id: method.request.header.x-datadog-parent-id
+          integration.request.header.x-datadog-sampling-priority: method.request.header.x-datadog-sampling-priority
+          integration.request.header.x-datadog-trace-id: method.request.header.x-datadog-trace-id
+        responses:
+          '200':
+            responseParameters:
+              method.response.header.Access-Control-Allow-Origin: '''foo.com'''
+              method.response.header.Access-Control-Expose-Headers: '''x-ping'''
+              method.response.header.x-ping: integration.response.header.x-ping
+            statusCode: '200'
+          '400':
+            responseParameters:
+              method.response.header.Access-Control-Allow-Origin: '''foo.com'''
+            statusCode: '400'
+          '404':
+            responseParameters:
+              method.response.header.Access-Control-Allow-Origin: '''foo.com'''
+            statusCode: '404'
+          default:
+            responseParameters:
+              method.response.header.Access-Control-Allow-Origin: '''foo.com'''
+            statusCode: '500'
+        type: http
+        uri: https://integration.com/-/ping
+      x-amazon-apigateway-request-validator: all
+    post:
+      description: Post a custom Ping request
+      operationId: pingPost
+      parameters:
+      - in: header
+        name: host
+        required: false
+        schema:
+          type: string
+      - in: header
+        name: authorization
+        required: false
+        schema:
+          type: string
+      - in: header
+        name: x-datadog-trace-id
+        required: false
+        schema:
+          type: string
+      - in: header
+        name: x-datadog-parent-id
+        required: false
+        schema:
+          type: string
+      - in: header
+        name: x-datadog-origin
+        required: false
+        schema:
+          type: string
+      - in: header
+        name: x-datadog-sampling-priority
+        required: false
+        schema:
+          type: string
+      requestBody:
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/PingPayload'
+        required: true
+      responses:
+        '200':
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/PingPayload'
+          description: Ping
+          headers:
+            Access-Control-Allow-Origin:
+              schema:
+                example: foo.com
+                type: string
+            Access-Control-Expose-Headers:
+              schema:
+                example: x-ping
+                type: string
+            x-ping:
+              schema:
+                type: string
+        '400':
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ErrorResponseBadRequest'
+          description: Bad Request
+          headers:
+            Access-Control-Allow-Origin:
+              schema:
+                example: foo.com
+                type: string
+        '404':
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ErrorResponseNotFound'
+          description: Not Found
+          headers:
+            Access-Control-Allow-Origin:
+              schema:
+                example: foo.com
+                type: string
+        '500':
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ErrorResponse'
+          description: Internal Server Error
+          headers:
+            Access-Control-Allow-Origin:
+              schema:
+                example: foo.com
+                type: string
+      tags:
+      - Health
+      x-amazon-apigateway-integration:
+        connectionId: 1234567890
+        connectionType: VPC_LINK
+        httpMethod: POST
+        passthroughBehavior: when_no_match
+        requestParameters:
+          integration.request.header.User-Agent: context.identity.userAgent
+          integration.request.header.X-Forwarded-For: context.identity.sourceIp
+          integration.request.header.X-Stage: context.stage
+          integration.request.header.authorization: method.request.header.authorization
+          integration.request.header.host: method.request.header.host
+          integration.request.header.x-datadog-origin: method.request.header.x-datadog-origin
+          integration.request.header.x-datadog-parent-id: method.request.header.x-datadog-parent-id
+          integration.request.header.x-datadog-sampling-priority: method.request.header.x-datadog-sampling-priority
+          integration.request.header.x-datadog-trace-id: method.request.header.x-datadog-trace-id
+        responses:
+          '200':
+            responseParameters:
+              method.response.header.Access-Control-Allow-Origin: '''foo.com'''
+              method.response.header.Access-Control-Expose-Headers: '''x-ping'''
+              method.response.header.x-ping: integration.response.header.x-ping
+            statusCode: '200'
+          '400':
+            responseParameters:
+              method.response.header.Access-Control-Allow-Origin: '''foo.com'''
+            statusCode: '400'
+          '404':
+            responseParameters:
+              method.response.header.Access-Control-Allow-Origin: '''foo.com'''
+            statusCode: '404'
+          default:
+            responseParameters:
+              method.response.header.Access-Control-Allow-Origin: '''foo.com'''
+            statusCode: '500'
+        type: http
+        uri: https://integration.com/-/ping
+      x-amazon-apigateway-request-validator: all
   /api.v1.yml:
     get:
-      tags:
-      - Static Files
+      parameters:
+      - in: header
+        name: host
+        required: false
+        schema:
+          type: string
+      - in: header
+        name: authorization
+        required: false
+        schema:
+          type: string
+      - in: header
+        name: x-datadog-trace-id
+        required: false
+        schema:
+          type: string
+      - in: header
+        name: x-datadog-parent-id
+        required: false
+        schema:
+          type: string
+      - in: header
+        name: x-datadog-origin
+        required: false
+        schema:
+          type: string
+      - in: header
+        name: x-datadog-sampling-priority
+        required: false
+        schema:
+          type: string
       responses:
         '200':
           description: Static file api.v1.yml
           headers:
             Access-Control-Allow-Origin:
               schema:
+                example: foo.com
                 type: string
-                example: 'foo.com'
             Access-Control-Expose-Headers:
               schema:
                 example: Content-Type
@@ -456,295 +675,80 @@ paths:
               schema:
                 example: text/yaml
                 type: string
-      parameters:
-      - name: host
-        in: header
-        required: false
-        schema:
-          type: string
-      - name: authorization
-        in: header
-        required: false
-        schema:
-          type: string
-      - name: x-datadog-trace-id
-        in: header
-        required: false
-        schema:
-          type: string
-      - name: x-datadog-parent-id
-        in: header
-        required: false
-        schema:
-          type: string
-      - name: x-datadog-origin
-        in: header
-        required: false
-        schema:
-          type: string
-      - name: x-datadog-sampling-priority
-        in: header
-        required: false
-        schema:
-          type: string
+      tags:
+      - Static Files
       x-amazon-apigateway-integration:
-        type: http
         connectionId: 1234567890
-        httpMethod: GET
-        uri: https://integration.com/api.v1.yml
-        passthroughBehavior: when_no_match
         connectionType: VPC_LINK
-        responses:
-          default:
-            statusCode: '500'
-            responseParameters:
-              method.response.header.Access-Control-Allow-Origin: '''foo.com'''
-          '200':
-            statusCode: '200'
-            responseParameters:
-              method.response.header.Access-Control-Allow-Origin: '''foo.com'''
-              method.response.header.Access-Control-Expose-Headers: '''Content-Type'''
-              method.response.header.Content-Type: integration.response.header.Content-Type
+        httpMethod: GET
+        passthroughBehavior: when_no_match
         requestParameters:
           integration.request.header.User-Agent: context.identity.userAgent
           integration.request.header.X-Forwarded-For: context.identity.sourceIp
           integration.request.header.X-Stage: context.stage
-          integration.request.header.host: method.request.header.host
           integration.request.header.authorization: method.request.header.authorization
-          integration.request.header.x-datadog-trace-id: method.request.header.x-datadog-trace-id
-          integration.request.header.x-datadog-parent-id: method.request.header.x-datadog-parent-id
+          integration.request.header.host: method.request.header.host
           integration.request.header.x-datadog-origin: method.request.header.x-datadog-origin
+          integration.request.header.x-datadog-parent-id: method.request.header.x-datadog-parent-id
           integration.request.header.x-datadog-sampling-priority: method.request.header.x-datadog-sampling-priority
+          integration.request.header.x-datadog-trace-id: method.request.header.x-datadog-trace-id
+        responses:
+          '200':
+            responseParameters:
+              method.response.header.Access-Control-Allow-Origin: '''foo.com'''
+              method.response.header.Access-Control-Expose-Headers: '''Content-Type'''
+              method.response.header.Content-Type: integration.response.header.Content-Type
+            statusCode: '200'
+          default:
+            responseParameters:
+              method.response.header.Access-Control-Allow-Origin: '''foo.com'''
+            statusCode: '500'
+        type: http
+        uri: https://integration.com/api.v1.yml
     options:
-      operationId: /api.v1.ymlCORS
       description: /api.v1.yml CORS
-      tags:
-      - CORS
+      operationId: /api.v1.ymlCORS
       responses:
         '200':
           description: '200'
           headers:
-            Access-Control-Allow-Origin:
-              schema:
-                type: string
-                example: 'foo.com'
-            Access-Control-Allow-Methods:
-              schema:
-                type: string
-                example: GET,OPTIONS
             Access-Control-Allow-Headers:
               schema:
-                type: string
                 example: authorization,host,x-datadog-origin,x-datadog-parent-id,x-datadog-sampling-priority,x-datadog-trace-id
+                type: string
+            Access-Control-Allow-Methods:
+              schema:
+                example: GET,OPTIONS
+                type: string
+            Access-Control-Allow-Origin:
+              schema:
+                example: foo.com
+                type: string
+      tags:
+      - CORS
       x-amazon-apigateway-integration:
+        passthroughBehavior: when_no_match
+        requestTemplates:
+          application/json: '{"statusCode": 200}'
         responses:
           default:
-            statusCode: '200'
             responseParameters:
               method.response.header.Access-Control-Allow-Headers: '''authorization,host,x-datadog-origin,x-datadog-parent-id,x-datadog-sampling-priority,x-datadog-trace-id'''
               method.response.header.Access-Control-Allow-Methods: '''GET,OPTIONS'''
               method.response.header.Access-Control-Allow-Origin: '''foo.com'''
-        requestTemplates:
-          application/json: '{"statusCode": 200}'
-        passthroughBehavior: when_no_match
+            statusCode: '200'
         type: mock
-components:
-  schemas:
-    PingPayload:
-      additionalProperties: false
-      type: object
-      required:
-      - ping
-      - category
-      properties:
-        ping:
-          type: string
-          example: pong
-        pingBy:
-          type: string
-          description: Unique user identifier
-          example: user@server.com
-        pingAt:
-          type: string
-          format: date-time
-        locations:
-          type: array
-          items:
-            type: string
-        category:
-          nullable: true
-          enum:
-          - null
-          - machine
-          - human
-          - other
-          type: string
-        directions:
-          items:
-            enum:
-            - north
-            - east
-            - south
-            - west
-            type: string
-          type: array
-        priority:
-          type: integer
-          default: 0
-          enum:
-          - 0
-          - 10
-          - 20
-          - 30
-          - 40
-        _embedded:
-          additionalProperties: false
-          type: object
-          required:
-            - mandatory
-          properties:
-            preference:
-              type: string
-            mandatory:
-              type: string
-        _not_required:
-          additionalProperties: false
-          type: object
-          properties:
-            optionalA:
-              type: string
-            optionalB:
-              type: string
-        _not_strict:
-          type: object
-          properties:
-            optionalA:
-              type: string
-            optionalB:
-              type: string
-    PingPayloadPatch:
-      additionalProperties: false
-      type: object
-      properties:
-        ping:
-          type: string
-          example: pong
-        pingBy:
-          type: string
-          description: Unique user identifier
-          example: user@server.com
-        pingAt:
-          type: string
-          format: date-time
-        locations:
-          type: array
-          items:
-            type: string
-        category:
-          nullable: true
-          enum:
-          - null
-          - machine
-          - human
-          - other
-          type: string
-        directions:
-          items:
-            enum:
-            - north
-            - east
-            - south
-            - west
-            type: string
-          type: array
-        priority:
-          type: integer
-          default: 0
-          enum:
-          - 0
-          - 10
-          - 20
-          - 30
-          - 40
-        _embedded:
-          additionalProperties: false
-          type: object
-          properties:
-            preference:
-              type: string
-            mandatory:
-              type: string
-        _not_required:
-          additionalProperties: false
-          type: object
-          properties:
-            optionalA:
-              type: string
-            optionalB:
-              type: string
-        _not_strict:
-          type: object
-          properties:
-            optionalA:
-              type: string
-            optionalB:
-              type: string
-    ErrorResponse:
-      additionalProperties: false
-      type: object
-      required:
-      - code
-      - message
-      - incident
-      properties:
-        code:
-          type: integer
-          example: 500
-        message:
-          type: string
-          example: Internal Server Error
-        incident:
-          description: Unique incident identifier
-          type: string
-          example: 5beb965c-7ffc-468b-a063-eb47c5b366c2
-    ErrorResponseBadRequest:
-      additionalProperties: false
-      type: object
-      required:
-      - code
-      - message
-      - incident
-      properties:
-        code:
-          type: integer
-          example: 400
-        message:
-          type: string
-          example: Bad Request
-        incident:
-          description: Unique incident identifier
-          type: string
-          example: 5beb965c-7ffc-468b-a063-eb47c5b366c2
-    ErrorResponseNotFound:
-      additionalProperties: false
-      type: object
-      required:
-      - code
-      - message
-      - incident
-      properties:
-        code:
-          type: integer
-          example: 404
-        message:
-          type: string
-          example: Not Found
-        incident:
-          description: Unique incident identifier
-          type: string
-          example: 5beb965c-7ffc-468b-a063-eb47c5b366c2
+servers:
+- url: https://api.fabfuel.de/test
+tags:
+- description: Ping and health check endpoints
+  name: Health
+- description: Static file content
+  name: Static Files
+- description: CORS configuration endpoints
+  name: CORS
+x-amazon-apigateway-minimum-compression-size: 0
 x-amazon-apigateway-request-validators:
   all:
-    validateRequestParameters: true
     validateRequestBody: true
-x-amazon-apigateway-minimum-compression-size: 0
+    validateRequestParameters: true

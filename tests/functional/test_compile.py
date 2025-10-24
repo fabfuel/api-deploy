@@ -23,6 +23,12 @@ def simple_target_file():
 
 
 @fixture
+def simple_target_file_raw():
+    with open(os.path.join(dirname, '../openapi/simple_target.yml'), 'r') as target_file:
+        return target_file.read()
+
+
+@fixture
 def complex_source_file():
     filename = os.path.join(dirname, '../openapi/complex_source.yml')
     return Schema.from_file(filename)
@@ -61,6 +67,12 @@ def test_compile_simple(simple_source_file, simple_target_file):
     manager = ProcessManager.default(config)
     processed = manager.process(simple_source_file)
     assert processed.dump(True) == simple_target_file.dump(True)
+
+
+def test_compile_simple_raw(simple_source_file, simple_target_file_raw):
+    manager = ProcessManager.default(config)
+    processed = manager.process(simple_source_file)
+    assert processed.dump(True) == simple_target_file_raw
 
 
 def test_compile_complex(complex_source_file, complex_target_file):

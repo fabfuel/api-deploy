@@ -1,7 +1,23 @@
 from typing import Dict
 import yaml
+import re
 
 yaml.Dumper.ignore_aliases = lambda *args: True
+
+
+# pyyaml interprets strings which are octals as int so we're overriding this behavior
+def represent_str(self, data):
+    """Custom string representer that forces quoting for strings with leading zeros"""
+    # Only quote strings that look like numbers with leading zeros (but not just "0")
+    if re.match(r'^0[0-9]+$', data):
+        return self.represent_scalar('tag:yaml.org,2002:str', data, style="'")
+
+    # Use the default behavior for all other strings
+    return yaml.Dumper.represent_str(self, data)
+
+
+# Attach custom representer to the default YAML dumper
+yaml.add_representer(str, represent_str)
 
 
 class YamlDict(Dict):

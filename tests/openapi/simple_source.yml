@@ -81,6 +81,8 @@ components:
         - east
         - south
         - west
+        - "1190"
+        - "0119"
 
     PingPayload:
       type: object
