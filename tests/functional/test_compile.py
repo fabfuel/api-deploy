@@ -72,7 +72,6 @@ def test_compile_simple(simple_source_file, simple_target_file):
 def test_compile_simple_raw(simple_source_file, simple_target_file_raw):
     manager = ProcessManager.default(config)
     processed = manager.process(simple_source_file)
-    print(processed.dump(True))
     assert processed.dump(True) == simple_target_file_raw
 
 
