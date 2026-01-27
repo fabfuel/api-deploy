@@ -69,6 +69,9 @@ def deploy(config_file,
         # Always remove scopes when deploying to Amazon API Gateway
         config['gateway']['remove_scopes'] = True
 
+        # Always remove descriptions when deploying to Amazon API Gateway
+        config['gateway']['remove_descriptions'] = True
+
         target_schema = _compile(source_schema, config)
         click.secho('Successfully compiled OpenAPI file.\n', fg='green')
 

@@ -1109,26 +1109,19 @@ components:
             datetime:
               type: string
               format: date-time
-              description: Current date and time of the server
             name:
               type: string
-              description: Name of the application
             environment:
               type: string
-              description: Name of the environment the app is running in
             uptime:
               type: string
-              description: Duration of how long the app is running
             startup:
               type: string
               format: date-time
-              description: Date and time when the application started
             hostname:
               type: string
-              description: Hostname of the application host or container
             version:
               type: string
-              description: Current release version
           required:
           - datetime
           - name
@@ -1161,15 +1154,11 @@ components:
                     type: string
                     readOnly: true
                     example: lorem-ipsum
-                    description: Alphanumeric version of the label without spaces
-                      or special chars.
                   name:
                     type: string
                     example: Lorem Ipsum
-                    description: Human readable name
                   color:
                     type: string
-                    description: Color of the label
                     enum:
                     - red
                     - green
@@ -1195,19 +1184,15 @@ components:
           additionalProperties: false
           properties:
             count:
-              description: Number of fetched items
               type: integer
               default: 10
             total:
-              description: Total number of items available in the list
               type: integer
               default: 15
             limit:
-              description: Maximum number of items to fetch
               type: integer
               default: 50
             offset:
-              description: Number if items skipped (for pagination)
               type: integer
               default: 0
           required:
@@ -1269,25 +1254,20 @@ components:
                     format: uuid
                   attachments:
                     type: array
-                    description: Array of file attachments
                     items:
                       type: object
                       nullable: true
-                      description: File attachment details
                       additionalProperties: false
                       properties:
                         name:
                           type: string
-                          description: Human readable file name
                           example: example.pdf
                         path:
                           type: string
-                          description: Relative file path of the attachment
                           example: /vendors/1234567890/some.pdf
                         uploadedAt:
                           type: string
                           format: date-time
-                          description: Date and time of when the attachment was uploaded
                         uploadedBy:
                           type: string
                           format: uuid
@@ -1302,7 +1282,6 @@ components:
                     example: User generated info about the offer
                   state:
                     type: string
-                    description: The current state of the offer
                     readOnly: true
                     enum:
                     - draft
@@ -1429,26 +1408,20 @@ components:
                               format: uuid
                             attachments:
                               type: array
-                              description: Array of file attachments
                               items:
                                 type: object
                                 nullable: true
-                                description: File attachment details
                                 additionalProperties: false
                                 properties:
                                   name:
                                     type: string
-                                    description: Human readable file name
                                     example: example.pdf
                                   path:
                                     type: string
-                                    description: Relative file path of the attachment
                                     example: /vendors/1234567890/some.pdf
                                   uploadedAt:
                                     type: string
                                     format: date-time
-                                    description: Date and time of when the attachment
-                                      was uploaded
                                   uploadedBy:
                                     type: string
                                     format: uuid
@@ -1462,16 +1435,12 @@ components:
                               additionalProperties: false
                               properties:
                                 name:
-                                  description: name of the company
                                   type: string
                                   example: Company AY
                                 email:
-                                  description: primary contact email of the company
                                   type: string
                                   example: mail@server.com
                                 phoneNumber:
-                                  description: primary contact phone number of the
-                                    company
                                   type: string
                                   example: +49 (30) 1234567890
                                   nullable: true
@@ -1480,31 +1449,22 @@ components:
                                   additionalProperties: false
                                   properties:
                                     streetAddress:
-                                      description: Full street address component,
-                                        which MAY include house number, street name,
-                                        Post Office Box, and multi-line extended street
-                                        address information.
                                       type: string
                                       example: My Street 123
                                       nullable: true
                                     postalCode:
-                                      description: Zip code or postal code component.
                                       type: string
                                       minLength: 1
                                       example: '10119'
                                     locality:
-                                      description: City or locality component.
                                       type: string
                                       example: Berlin
                                       nullable: true
                                     region:
-                                      description: State, province, prefecture, or
-                                        region component.
                                       type: string
                                       example: Berlin
                                       nullable: true
                                     country:
-                                      description: Country name component.
                                       type: string
                                       minLength: 1
                                       maxLength: 2
@@ -1523,15 +1483,12 @@ components:
                             description:
                               type: string
                               example: This is an example project
-                              description: A human readable project description
                               nullable: true
                             title:
                               type: string
                               example: Example project
-                              description: A custom, human readable project title
                             state:
                               type: string
-                              description: The current state of the project
                               readOnly: true
                               enum:
                               - new
@@ -1657,19 +1614,15 @@ components:
           additionalProperties: false
           properties:
             count:
-              description: Number of fetched items
               type: integer
               default: 10
             total:
-              description: Total number of items available in the list
               type: integer
               default: 15
             limit:
-              description: Maximum number of items to fetch
               type: integer
               default: 50
             offset:
-              description: Number if items skipped (for pagination)
               type: integer
               default: 0
           required:
@@ -1721,25 +1674,20 @@ components:
           format: uuid
         attachments:
           type: array
-          description: Array of file attachments
           items:
             type: object
             nullable: true
-            description: File attachment details
             additionalProperties: false
             properties:
               name:
                 type: string
-                description: Human readable file name
                 example: example.pdf
               path:
                 type: string
-                description: Relative file path of the attachment
                 example: /vendors/1234567890/some.pdf
               uploadedAt:
                 type: string
                 format: date-time
-                description: Date and time of when the attachment was uploaded
               uploadedBy:
                 type: string
                 format: uuid
@@ -1754,7 +1702,6 @@ components:
           example: User generated info about the offer
         state:
           type: string
-          description: The current state of the offer
           readOnly: true
           enum:
           - draft
@@ -1881,25 +1828,20 @@ components:
                     format: uuid
                   attachments:
                     type: array
-                    description: Array of file attachments
                     items:
                       type: object
                       nullable: true
-                      description: File attachment details
                       additionalProperties: false
                       properties:
                         name:
                           type: string
-                          description: Human readable file name
                           example: example.pdf
                         path:
                           type: string
-                          description: Relative file path of the attachment
                           example: /vendors/1234567890/some.pdf
                         uploadedAt:
                           type: string
                           format: date-time
-                          description: Date and time of when the attachment was uploaded
                         uploadedBy:
                           type: string
                           format: uuid
@@ -1913,15 +1855,12 @@ components:
                     additionalProperties: false
                     properties:
                       name:
-                        description: name of the company
                         type: string
                         example: Company AY
                       email:
-                        description: primary contact email of the company
                         type: string
                         example: mail@server.com
                       phoneNumber:
-                        description: primary contact phone number of the company
                         type: string
                         example: +49 (30) 1234567890
                         nullable: true
@@ -1930,29 +1869,22 @@ components:
                         additionalProperties: false
                         properties:
                           streetAddress:
-                            description: Full street address component, which MAY
-                              include house number, street name, Post Office Box,
-                              and multi-line extended street address information.
                             type: string
                             example: My Street 123
                             nullable: true
                           postalCode:
-                            description: Zip code or postal code component.
                             type: string
                             minLength: 1
                             example: '10119'
                           locality:
-                            description: City or locality component.
                             type: string
                             example: Berlin
                             nullable: true
                           region:
-                            description: State, province, prefecture, or region component.
                             type: string
                             example: Berlin
                             nullable: true
                           country:
-                            description: Country name component.
                             type: string
                             minLength: 1
                             maxLength: 2
@@ -1971,15 +1903,12 @@ components:
                   description:
                     type: string
                     example: This is an example project
-                    description: A human readable project description
                     nullable: true
                   title:
                     type: string
                     example: Example project
-                    description: A custom, human readable project title
                   state:
                     type: string
-                    description: The current state of the project
                     readOnly: true
                     enum:
                     - new
