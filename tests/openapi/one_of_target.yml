@@ -355,22 +355,18 @@ components:
         recipients:
           type: array
           minItems: 1
-          description: URN of the recipient, could be a User URN or a Role URN
           example:
             - urn:pm:users:pm.demo:user/1234-123456-123456-1234
             - urn:pm:users:pm.demo:role/customer
           items:
-            description: Uniform Resource Name
             example: urn:pm:service::foobar/d9a6fc2e-a4b3-4fba-9f20-c5bd2fdb5071
             pattern: ^urn:[\w-]+:[\w.-]*:[\w.-]*:[\w-]+\/[^\/]+$
             type: string
 
         subject:
-          description: Subject of the notification
           type: string
         message:
           type: string
-          description: Message to use for the notification
           enum:
             - UserCreated
             - ProjectCreated
@@ -403,22 +399,18 @@ components:
         recipients:
           type: array
           minItems: 1
-          description: URN of the recipient, could be a User URN or a Role URN
           example:
             - urn:pm:users:pm.demo:user/1234-123456-123456-1234
             - urn:pm:users:pm.demo:role/customer
           items:
-            description: Uniform Resource Name
             example: urn:pm:service::foobar/d9a6fc2e-a4b3-4fba-9f20-c5bd2fdb5071
             pattern: ^urn:[\w-]+:[\w.-]*:[\w.-]*:[\w-]+\/[^\/]+$
             type: string
 
         subject:
-          description: Subject of the notification
           type: string
         message:
           type: string
-          description: Message to use for the notification
           enum:
             - UserCreated
             - ProjectCreated

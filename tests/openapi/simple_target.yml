@@ -7,7 +7,6 @@ components:
           example: 500
           type: integer
         incident:
-          description: Unique incident identifier
           example: 5beb965c-7ffc-468b-a063-eb47c5b366c2
           type: string
         message:
@@ -25,7 +24,6 @@ components:
           example: 400
           type: integer
         incident:
-          description: Unique incident identifier
           example: 5beb965c-7ffc-468b-a063-eb47c5b366c2
           type: string
         message:
@@ -43,7 +41,6 @@ components:
           example: 404
           type: integer
         incident:
-          description: Unique incident identifier
           example: 5beb965c-7ffc-468b-a063-eb47c5b366c2
           type: string
         message:
@@ -112,7 +109,6 @@ components:
           format: date-time
           type: string
         pingBy:
-          description: Unique user identifier
           example: user@server.com
           type: string
         priority:
@@ -184,7 +180,6 @@ components:
           format: date-time
           type: string
         pingBy:
-          description: Unique user identifier
           example: user@server.com
           type: string
         priority:
