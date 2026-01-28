@@ -203,11 +203,12 @@ class FlattenProcessor(AbstractProcessor):
 
 
 class ApiGatewayProcessor(AbstractProcessor):
-    def __init__(self, config: Config, integration_host, connection_id, remove_scopes, **kwargs) -> None:
+    def __init__(self, config: Config, integration_host, connection_id, remove_scopes, remove_descriptions, **kwargs) -> None:
         super().__init__(config)
         self.integration_host = integration_host
         self.connection_id = connection_id
         self.remove_scopes = remove_scopes
+        self.remove_descriptions = remove_descriptions
 
     def process(self, schema: Schema) -> Schema:
         for path in schema['paths']:
@@ -231,6 +232,11 @@ class ApiGatewayProcessor(AbstractProcessor):
                             # remove all scopes from authorizer, not supported in API Gateway
                             security[authorizer] = []
 
+        # Remove all descriptions from models
+        if self.remove_descriptions:
+            for model_name in schema['components'].get('schemas', {}):
+                self._remove_descriptions(schema['components']['schemas'][model_name])
+
         # Replace all authorizers with API key type
         for authorizer in schema['components'].get('securitySchemes', {}):
             scheme = schema['components']['securitySchemes'][authorizer]
@@ -241,6 +247,22 @@ class ApiGatewayProcessor(AbstractProcessor):
             del schema['components']['securitySchemes'][authorizer]['flows']
 
         return schema
+
+
+    def _remove_descriptions(self, schema: object):
+        if isinstance(schema, dict):
+            schema.pop('description', None)
+
+            if 'properties' in schema:
+                for property_name in schema['properties']:
+                    self._remove_descriptions(schema['properties'][property_name])
+
+            if 'items' in schema:
+                self._remove_descriptions(schema['items'])
+                if 'properties' in schema['items']:
+                    for property_name in schema['items']['properties']:
+                        self._remove_descriptions(schema['items']['properties'][property_name])
+
 
     def _get_response_codes(self, schema, path, method):
         responses = {

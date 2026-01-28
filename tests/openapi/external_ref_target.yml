@@ -736,25 +736,19 @@ components:
         id:
           type: string
           example: 5d4470a6-121b-40d2-aff9-00f24aa4a110
-          description: Unique identifier, optionally in UUID format
           readOnly: true
         urn:
           type: string
           pattern: ^urn:[\w-]+:[\w.-]*:[\w.-]*:[\w-]+\/[^\/]+$
-          description: Uniform Resource Name
           example: urn:pm:service::foobar/d9a6fc2e-a4b3-4fba-9f20-c5bd2fdb5071
         tenant:
           type: string
           pattern: ^[a-z]{2,}(?:\.[a-z]{1}[a-z-]*[a-z]{1})*$
           example: pm.foobar
-          description: Globally unique tenant reverse domain name
           readOnly: true
         packmaticId:
           type: string
           pattern: ^[A-Z]{2}-[A-Z0-9]{5,7}$
-          description: Human friendly entity reference code, consisting of a type
-            indicating prefix and a unique identifier, consisting of uppercase letters
-            and digits.
           example: PJ-123ABC
           readOnly: true
         createdAt:
@@ -763,7 +757,6 @@ components:
         createdBy:
           type: string
           pattern: ^urn:[\w-]+:[\w.-]*:[\w.-]*:[\w-]+\/[^\/]+$
-          description: Uniform Resource Name
           example: urn:pm:service::foobar/d9a6fc2e-a4b3-4fba-9f20-c5bd2fdb5071
         modifiedAt:
           type: string
@@ -772,7 +765,6 @@ components:
         modifiedBy:
           type: string
           pattern: ^urn:[\w-]+:[\w.-]*:[\w.-]*:[\w-]+\/[^\/]+$
-          description: Uniform Resource Name
           example: urn:pm:service::foobar/d9a6fc2e-a4b3-4fba-9f20-c5bd2fdb5071
           nullable: true
     TestTwo:
@@ -791,25 +783,19 @@ components:
         id:
           type: string
           example: 5d4470a6-121b-40d2-aff9-00f24aa4a110
-          description: Unique identifier, optionally in UUID format
           readOnly: true
         urn:
           type: string
           pattern: ^urn:[\w-]+:[\w.-]*:[\w.-]*:[\w-]+\/[^\/]+$
-          description: Uniform Resource Name
           example: urn:pm:service::foobar/d9a6fc2e-a4b3-4fba-9f20-c5bd2fdb5071
         tenant:
           type: string
           pattern: ^[a-z]{2,}(?:\.[a-z]{1}[a-z-]*[a-z]{1})*$
           example: pm.foobar
-          description: Globally unique tenant reverse domain name
           readOnly: true
         packmaticId:
           type: string
           pattern: ^[A-Z]{2}-[A-Z0-9]{5,7}$
-          description: Human friendly entity reference code, consisting of a type
-            indicating prefix and a unique identifier, consisting of uppercase letters
-            and digits.
           example: PJ-123ABC
           readOnly: true
         createdAt:
@@ -818,7 +804,6 @@ components:
         createdBy:
           type: string
           pattern: ^urn:[\w-]+:[\w.-]*:[\w.-]*:[\w-]+\/[^\/]+$
-          description: Uniform Resource Name
           example: urn:pm:service::foobar/d9a6fc2e-a4b3-4fba-9f20-c5bd2fdb5071
         modifiedAt:
           type: string
@@ -827,7 +812,6 @@ components:
         modifiedBy:
           type: string
           pattern: ^urn:[\w-]+:[\w.-]*:[\w.-]*:[\w-]+\/[^\/]+$
-          description: Uniform Resource Name
           example: urn:pm:service::foobar/d9a6fc2e-a4b3-4fba-9f20-c5bd2fdb5071
           nullable: true
   securitySchemes:
